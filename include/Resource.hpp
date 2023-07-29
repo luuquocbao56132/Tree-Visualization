@@ -2,7 +2,7 @@
 #define Resource_hpp
 
 #include <SFML/Graphics.hpp>
-
+#include <iostream>
 class ResourceManager {
 public:
     static sf::Font& getFont();

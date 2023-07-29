@@ -39,13 +39,15 @@ void Button::centerOrigin(const sf::Vector2f& pos) {
 void Button::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
     target.draw(m_rect, states);
-    target.draw(m_text, states);    
+    target.draw(m_text, states);
 }
 
 void Button::setColor(){
     setFillColor(ButtonColor[typeTheme]);
     setOutlineColor(TextColor[typeTheme]);
     m_text.setFillColor(TextColor[typeTheme]);
+    std::cout << typeTheme << '\n';
+    std::cout << (int)TextColor[typeTheme].r << ' ' << (int)TextColor[typeTheme].g << ' ' << (int)TextColor[typeTheme].b << '\n';
 }
 
 void Button::setFillColor(const sf::Color& color) {
