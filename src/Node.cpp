@@ -7,7 +7,7 @@ Node::Node(float radius, const std::string& text, const sf::Font& font, float te
     m_color(color),
     m_position(position),
     m_text(text, font, text_size),
-    circle(0), stateCircle(0), typeNode(type),
+    stateCircle(0), typeNode(type),
     m_text_directions {sf::Text("", font, text_size), sf::Text("",font,text_size), sf::Text("",font,text_size), sf::Text("",font,text_size)}
 {
         // Set the position and color of the circle shape
@@ -43,7 +43,7 @@ Node::Node(float radius, const std::string& text, const sf::Font& font, float te
     m_text_directions[BOT].setStyle(sf::Text::Bold);
     m_text_directions[BOT].setOrigin(m_text_directions[BOT].getLocalBounds().width / 2.f, m_text_directions[BOT].getLocalBounds().height);
     m_text_directions[BOT].setPosition(sf::Vector2f(position.x, position.y + radius + text_size));
-    setDirectionColor(sf::Color::Red,BOT);
+    setDirectionColor(sf::Color(255, 0, 123),BOT);
     // west text
     m_text_directions[LEFT].setString("");
     m_text_directions[LEFT].setOrigin(m_text_directions[LEFT].getLocalBounds().width / 2.f, m_text_directions[LEFT].getLocalBounds().height);
@@ -138,10 +138,6 @@ void Node::setPosition(sf::Vector2f position){
 }
 
 void Node::setArrow(){
-    if (stateCircle){
-        updateCircle();
-    }
-
     if (nextNode != nullptr && !stateCircle){
         float length = dist2Node(getNodePosition(), nextNode->getNodePosition());
         rotateNextArrow(rad2Node(getNodePosition(), nextNode->getNodePosition()));
@@ -218,25 +214,12 @@ int Node::getValue(){
     return ResourceManager::StringtoInt(m_text.getString());
 }
 
-bool Node::getString(int t){
-    int l = 1, res = 0;
-    std::string s = m_text.getString();
-    for (int i = s.size()-1; i >= 0; --i)res += l*(s[i] - '0'), l *= 10;
-    return (t == res);
-}
-
-void Node::updateCircle(){
-    circle.setPosition(nextNode->getNodePosition(), getNodePosition());
-    setCircle(1);
-}
-
-void Node::setCircle(bool t){
-    stateCircle = t; circle.setState(t);
+std::string Node::getString(){
+    return m_text.getString();
 }
     
 void Node::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
-    if (stateCircle)target.draw(circle);
     if (typeNode)target.draw(m_circle, states);
         target.draw(m_rectangle, states);
     if (nextNode != nullptr && !stateCircle)target.draw(nextArrow, states);

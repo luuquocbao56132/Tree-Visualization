@@ -6,6 +6,7 @@
 #include <World.hpp>
 
 class Game{
+public:
     sf::RenderWindow mWindow;
     World mWorld;
 
@@ -13,7 +14,6 @@ class Game{
     void processEventsBreak();
     void update(sf::Time);
 
-    public:
     Game();
     void render();
     void render(int );

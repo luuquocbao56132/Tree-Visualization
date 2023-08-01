@@ -7,6 +7,7 @@ sf::Font& ResourceManager::getFont() {
     if (!loaded) {
         if (!font.loadFromFile("consolas.ttf")) {
             // handle error
+            std::cout << 118918;
         }
 
         loaded = true;

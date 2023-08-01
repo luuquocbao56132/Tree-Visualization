@@ -42,7 +42,7 @@ public:
 
     sf::Vector2f getNodePosition();
 
-    bool getString(int);
+    std::string getString();
 
     int getValue();
 
@@ -59,7 +59,6 @@ public:
     void setCircle(bool);
     int numArrow;
     bool stateCircle;
-    CircleArrow circle;
 private:
     bool typeNode;
     sf::CircleShape m_circle;

@@ -1,7 +1,7 @@
 #include <Theme.hpp>
 
 Theme::Theme(){
-    themeBut = Button(sf::Vector2f(1700,20), sf::Vector2f(120,65),"Theme", ResourceManager::getFont(), 25, 0);
+    themeBut = Button(sf::Vector2f(1790,10), sf::Vector2f(100,50),"Theme", ResourceManager::getFont(), 25, 0);
     backGroundTexture.loadFromFile("./Image/"+theme+"background.png");
     backGroundSprite.setTexture(backGroundTexture);
 }

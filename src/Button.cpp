@@ -46,8 +46,6 @@ void Button::setColor(){
     setFillColor(ButtonColor[typeTheme]);
     setOutlineColor(TextColor[typeTheme]);
     m_text.setFillColor(TextColor[typeTheme]);
-    std::cout << typeTheme << '\n';
-    std::cout << (int)TextColor[typeTheme].r << ' ' << (int)TextColor[typeTheme].g << ' ' << (int)TextColor[typeTheme].b << '\n';
 }
 
 void Button::setFillColor(const sf::Color& color) {
@@ -98,8 +96,8 @@ sf::FloatRect Button::getGlobalBounds() const {
 }
 
 void Button::createMinButton(std::initializer_list<std::string> names, std::initializer_list<int> numInputs){
-    LinkedList <std::string> Name(names);
-    LinkedList <int> numInput(numInputs);
+    std::vector <std::string> Name(names);
+    std::vector <int> numInput(numInputs);
 
     sf::Vector2f prevPos = getPosition();
     sf::Vector2f prevSize = getSize();

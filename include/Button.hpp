@@ -46,8 +46,8 @@ public:
     sf::Vector2f m_size;
     sf::RectangleShape m_rect;
     sf::Text m_text;
-    LinkedList < std::shared_ptr<Button> > minButton;
-    LinkedList < std::shared_ptr<InputBox> > inputButton;
+    std::vector < std::shared_ptr<Button> > minButton;
+    std::vector < std::shared_ptr<InputBox> > inputButton;
     int isInput;
     bool m_isHovered, onInput;
 };

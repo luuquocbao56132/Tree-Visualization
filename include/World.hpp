@@ -2,16 +2,16 @@
 #define World_hpp
 
 #include <BaseHeader.hpp>
-// #include <DataTypes.hpp>
+#include <DataTypes.hpp>
 #include <Button.hpp>
 #include <set>
-#include <vector>
+#include <Vector>
 #include <Menu.hpp>
 #include <HashTable.hpp>
 
 class World: public sf::Transformable, public sf::Drawable, private sf::NonCopyable {
 public:
-    // std::shared_ptr <DataTypes> liveData;
+    std::shared_ptr <DataTypes> liveData;
     Menu menu;
 
     World();
