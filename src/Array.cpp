@@ -220,9 +220,9 @@ void Array::removeSearchingNode(int vtx, float ratio){
 }
 
 void Array::setFoundNode(int vtx, float ratio){
-    listNode[vtx]->setOutlineColor(ResourceManager::changeColor(sf::Color::Black, FoundNodeColor, ratio));
-    listNode[vtx]->setNodeColor(ResourceManager::changeColor(FirstNodeColor, FoundNodeColor, ratio));
-    listNode[vtx]->setTextColor(ResourceManager::changeColor(textColorStart, textColorEnd, ratio));
+    listNode[vtx]->setOutlineColor(ResourceManager::changeColor(SearchingNodeColor, FoundNodeColor, ratio));
+    listNode[vtx]->setNodeColor(ResourceManager::changeColor(SearchingNodeColor, FoundNodeColor, ratio));
+    listNode[vtx]->setTextColor(ResourceManager::changeColor(textColorEnd, textColorEnd, ratio));
 }
 
 void Array::removeFoundNode(int vtx, float ratio){

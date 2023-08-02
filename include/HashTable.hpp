@@ -19,9 +19,12 @@ public:
     void insert(int);
     void remove(int);
     void search(int);
+    void fromfile();
+    void checkFunction() override;
     // void getFromFile();
     void checkPress(sf::Vector2f ) override;
 
+    std::queue <Animation> funcQueue;
     Array graph;
 };
 

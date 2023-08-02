@@ -14,6 +14,8 @@
 #include <string.h>
 #include <set>
 #include <fstream>
+#include <functional>
+#include <queue>
 #include <windows.h>
 #include <memory>
 

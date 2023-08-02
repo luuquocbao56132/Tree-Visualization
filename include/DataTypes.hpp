@@ -7,6 +7,7 @@
 // #include <Graph.hpp>
 #include <Theme.hpp>
 #include <Node.hpp>
+#include <Animation.hpp>
 
 class DataTypes: public sf::Drawable, public sf::Transformable{
 public:
@@ -16,6 +17,7 @@ public:
     void checkHover(sf::Vector2f);
     void checkKeyInput(sf::Event& );
     void setTheme();
+    virtual void checkFunction();
     virtual void checkPress(sf::Vector2f);
     // virtual void resetAll();
     std::vector <std::shared_ptr<Button>> BaseButton, functionButton;
