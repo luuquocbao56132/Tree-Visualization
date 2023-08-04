@@ -17,12 +17,14 @@ public:
     void checkHover(sf::Vector2f);
     void checkKeyInput(sf::Event& );
     void setTheme();
+    void clearQueue();
     virtual void checkFunction();
     virtual void checkPress(sf::Vector2f);
     // virtual void resetAll();
     std::vector <std::shared_ptr<Button>> BaseButton, functionButton;
     std::vector <std::shared_ptr<InputBox>> inputBox;
     std::shared_ptr <Node> newNode;
+    std::queue <Animation> funcQueue;
     Button upSpeed, downSpeed, previousButton, nextButton, MenuButton;
     Theme themeSet;
     sf::RectangleShape graphSquare;

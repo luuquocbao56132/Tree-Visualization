@@ -17,7 +17,7 @@ InputBox::InputBox (sf::Vector2f position, sf::Vector2f size, std::string textLe
     
     m_textLeft.setFont(ResourceManager::getFont());
     m_textLeft.setCharacterSize(19);
-    m_textLeft.setFillColor(sf::Color::Yellow);
+    m_textLeft.setFillColor(sf::Color::Red);
     m_textLeft.setString(textLeft);
     m_textLeft.setStyle(sf::Text::Bold);
     m_textLeft.setPosition(sf::Vector2f(position.x - 35, position.y));

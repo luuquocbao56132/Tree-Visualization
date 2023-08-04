@@ -24,8 +24,7 @@ public:
     // void getFromFile();
     void checkPress(sf::Vector2f ) override;
 
-    std::queue <Animation> funcQueue;
-    Array graph;
+    Array graph, firstGraph;
 };
 
 #endif /* HashTable_hpp */

@@ -10,15 +10,12 @@ Array::Array(){
 
 Array& Array::operator=(Array& other) {
     if (this != &other) { 
-        this->typeArray = other.typeArray;
         this->init(other.getSize());
         for (int i = 0; i < other.getSize(); ++i)
-            this->listNode[i]->changeSizeNode(this->listNode[i]->getRad() - CircleRad),
-            this->listNode[i]->setText(std::to_string(other.getValue(i))),
-            this->listNode[i]->changeSizeNode(this->listNode[i]->getRad() - other.listNode[i]->getRad()),
-            std::cout << std::to_string(other.getValue(i)) << " "; std::cout << '\n';
-        this->setNumber = other.setNumber;
-        this->newNode = other.newNode;
+            this->listNode[i]->setText(other.listNode[i]->getString());
+        this->numValue = other.numValue;
+        // std::cout << this->getSize() << '\n';
+        // for (int i = 0; i < this->getSize(); ++i)std::cout << this->listNode[i]->getValue() << ' '; std::cout << '\n';
     }
     return *this;
 }
@@ -36,18 +33,19 @@ void Array::init(int x){
 
 void Array::init(int x, std::vector <std::string> s){
     x = 40;
-    n = x; listNode.clear(); newNode = nullptr; resetStep(); nowStep = -1; isListNew = 0; numValue = s.size();
+    n = x; listNode.clear(); newNode = nullptr; isListNew = 0; nowStep = -1; numValue = s.size();
+    resetStep(); 
     highlight.addImage("./Image/" + theme + "Blank.png"); highlight.setHL(0);
     if (!n)return;
 
     leftBound = 850 - (100*(n) - arrowLength ) / 2;
+
     for (int i = 0; i < x; ++i){
         listNode.push_back(std::make_shared <Node> (19.f, "", ResourceManager::getFont(), 
                                     textSize, backgroundColor,sf::Vector2f(leftBound + 10 + 100*i, 250.f),ARRAY));
 
         listNode[i]->setTextBot(std::to_string(i));
     }        
-
     for (int i = 0; i < s.size(); ++i){
         int j = ResourceManager::StringtoInt(s[i]) % 40;
         while (listNode[j]->getString() != ""){
@@ -76,11 +74,6 @@ void Array::setValue(int vtx, int value){
 
 void Array::setSize(int nn){n = nn;}
 
-bool Array::checkSameNum(int x){
-    if (setNumber.find(x) != setNumber.end())return 1;
-    return 0;
-}
-
 std::string convertIntString(int x){
     std::string res = "";
     while (x){
@@ -92,8 +85,6 @@ std::string convertIntString(int x){
 
 int Array::randomNodeValue(){
     int t = ResourceManager::random(1,maxValue);
-    while (checkSameNum(t))t = ResourceManager::random(1, 99);
-    setNumber.insert(t);
     return t;
 }
 
@@ -124,15 +115,6 @@ void Array::delValue(int vtx){
     if (listNode[j]->getString() == "")return;
     listNode[j]->setText("");
     --numValue;
-}
-
-void Array::insertValue(int value){
-    int j = value % getSize();
-    while (listNode[j]->getString() != ""){
-        ++j; if (j == getSize())j = 0;
-    }
-    listNode[j]->setText(std::to_string(value));
-    ++numValue;
 }
 
 void Array::search(int value){

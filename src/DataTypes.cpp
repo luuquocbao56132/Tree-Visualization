@@ -91,6 +91,13 @@ DataTypes::DataTypes():
 //     //     std::cout << firstGraph.listNode[i]->getValue() << " "; std::cout << '\n';
 // }
 
+void DataTypes::checkFunction(){
+}
+
+void DataTypes::clearQueue(){
+    while (!funcQueue.empty())funcQueue.pop();
+}
+
 void DataTypes::setTheme(){
     // std::string res = mainGraph.highlight.url;
     // res.erase(0,8);
@@ -139,9 +146,9 @@ void DataTypes::checkHover(sf::Vector2f mousePos){
 
 void DataTypes::checkPress(sf::Vector2f mousePos){
     //if (LL_button.checkPress(mousePos))isTurn = 1;
+    if (MenuButton.checkPress(mousePos))gameGlobal->mWorld.liveData = nullptr;
     for (int i = 0; i < BaseButton.size(); ++i)if (BaseButton[i]->checkPress(mousePos))
         buttonState = i, inputBox.clear(); 
-    if (MenuButton.checkPress(mousePos))gameGlobal->mWorld.liveData = nullptr;
     if (upSpeed.checkPress(mousePos))xtime = std::min(xtime + 1, 10.f), timeText.setString(std::to_string((int)xtime)+"x");
     if (downSpeed.checkPress(mousePos))xtime = std::max(xtime - 1, 1.f), timeText.setString(std::to_string((int)xtime) + "x");
     // if (previousButton.checkPress(mousePos))mainGraph.getStep(-1);
@@ -150,6 +157,6 @@ void DataTypes::checkPress(sf::Vector2f mousePos){
     numFrame = 1.f/xtime * 60;
 }
 
-// void DataTypes::checkKeyInput(sf::Event& event){
-//     for (auto i : inputBox)if (i->cursorOn)i->handleEvent(event);
-// }
+void DataTypes::checkKeyInput(sf::Event& event){
+    for (auto i : inputBox)if (i->cursorOn)i->handleEvent(event);
+}

@@ -10,7 +10,7 @@ Game::Game(): mWindow(sf::VideoMode(1900,900), "Data Visualization", sf::Style::
 void Game::run(){
     sf::Clock clock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
-    sf::Time TimePerFrame = sf::milliseconds(8);
+    sf::Time TimePerFrame = sf::seconds(1.f/60.f);
     while (mWindow.isOpen()){
         processEvents();
         timeSinceLastUpdate += clock.restart();
@@ -42,10 +42,9 @@ void Game::processEvents(){
                 mWorld.HoverCheck(mousePos);
                 break;
         }
-        // if (event.type == sf::Event::KeyPressed){
-        //     mWorld.liveData->checkKeyInput(event);
-        // }
-        // std::cout << "event" << '\n';
+        if (event.type == sf::Event::KeyPressed){
+            mWorld.liveData->checkKeyInput(event);
+        }
     }
 }
 
