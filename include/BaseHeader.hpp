@@ -39,9 +39,14 @@ enum AroundNode{
     Next
 };
 
+enum Child{
+    node,
+    arrow
+};
+
 enum TypeGraph{
     ARRAY,
-    Vector,
+    CIRCLE,
     DOUBLYVector,
     CIRCULARVector
 };

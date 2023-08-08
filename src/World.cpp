@@ -28,6 +28,9 @@ void World::checkPress(sf::Vector2f mousePos){
         case 1:
             liveData = std::make_shared <HashTable> ();
             break;
+        case 2:
+            liveData = std::make_shared <AVL> ();
+            break;
     }
     }
     if (liveData)std::cout << "liveData\n";

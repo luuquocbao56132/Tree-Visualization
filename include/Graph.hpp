@@ -12,7 +12,7 @@ public:
     Graph();
     Graph(int);
     Graph& operator=(Graph& other);
-    void init(int, LinkedList <std::string> );
+    void init(int, std::vector <std::string> );
     void init(int );
     void init();
     void setNode();
@@ -20,9 +20,9 @@ public:
     int randomNodeValue();
     void draw(sf::RenderTarget& , sf::RenderStates ) const override;
 
-    void removeNode(int );
+    void delValue(int );
     void setNodeColor(int, sf::Color);
-    void setArrowColor(int, float);
+    void setArrowColor(std::shared_ptr <Node>, float, int);
 
     void setSearchingNode(int, float);
     void setDelNode(int, float);
@@ -30,8 +30,10 @@ public:
     void setFoundNode(int, float);
     void removeFoundNode(int, float);
 
-    void makeNewNode(int, int);
+    void insertValue(int);
+    void search(int);
     int getValue(int );
+    int getNumValue();
     void setValue(int,int);
     int getSize();
     void setSize(int);
@@ -41,11 +43,12 @@ public:
     void saveStep();
 
     int typeGraph, numArrow, nowStep;
-    std::shared_ptr <int> n;
-    LinkedList <std::shared_ptr <Node>> listNode;
-    LinkedList < LinkedList <std::shared_ptr<Node> > > stepNode, stepListNew;
-    LinkedList < std::shared_ptr <Node> > stepNewNode, listNew;
-    LinkedList <int> stepString, stepIsListNew;
+    int n, numValue;
+    std::vector <std::shared_ptr <Node>> listNode;
+    std::shared_ptr <Node> pHead;
+    std::vector < std::vector <std::shared_ptr<Node> > > stepNode, stepListNew;
+    std::vector < std::shared_ptr <Node> > stepNewNode, listNew;
+    std::vector <int> stepString, stepIsListNew;
     Highlight highlight;
     std::shared_ptr <Node> newNode;
     int leftBound, numberNow, isListNew;

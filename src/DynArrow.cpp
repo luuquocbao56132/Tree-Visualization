@@ -81,7 +81,6 @@ void DynArrow::draw(sf::RenderTarget& target, sf::RenderStates states) const{
     if (m_length < 12)return;
     target.draw(m_body, states);
     if (m_particle.getSize().y > 0)target.draw(m_particle, states);
-    target.draw(m_head, states);
 }
 
 

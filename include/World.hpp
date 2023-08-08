@@ -8,7 +8,7 @@
 #include <Vector>
 #include <Menu.hpp>
 #include <HashTable.hpp>
-
+#include <AVL.hpp>
 class World: public sf::Transformable, public sf::Drawable, private sf::NonCopyable {
 public:
     std::shared_ptr <DataTypes> liveData;

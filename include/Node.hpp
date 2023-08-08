@@ -11,6 +11,7 @@ class Node : public sf::Drawable, public sf::Transformable{
 public:
     Node();
     Node(float radius, const std::string& , const sf::Font& , float , const sf::Color& , const sf::Vector2f& , bool);
+    Node(float radius, const std::string& , const sf::Font& , float , const sf::Color& , const sf::Vector2f& , bool, int);
 
     void setColor(const sf::Color& );
 
@@ -27,16 +28,15 @@ public:
 
     void setPosition(sf::Vector2f );
 
-    void setPartialColor(float );
+    void setPartialColor(float , int);
 
-    void rotateNextArrow(float );
-    void rotatePrevArrow(float );
+    void rotateNextArrow(float ,int );
 
-    void changeSizeArrow(float );
+    void changeSizeArrow(float, int);
 
     void changeSizeNode(float);
 
-    float getLengthArrow();
+    float getLengthArrow(int);
 
     float getRad();
 
@@ -48,17 +48,18 @@ public:
 
     void changeText(Direction, std::string );
 
+    void setHeight(int );
+    int getHeight();
+
     void draw(sf::RenderTarget& , sf::RenderStates ) const override;
 
-    std::shared_ptr <Node> nextNode, prevNode;
-
-    DynArrow nextArrow, prevArrow;
+    std::vector < std::pair < std::shared_ptr <Node>, DynArrow > > childNode;
+    std::shared_ptr <Node> prevNode;
 
     sf::Text m_text_directions[4];
     void updateCircle();
     void setCircle(bool);
-    int numArrow;
-    bool stateCircle;
+    int numArrow, H;
 private:
     bool typeNode;
     sf::CircleShape m_circle;
