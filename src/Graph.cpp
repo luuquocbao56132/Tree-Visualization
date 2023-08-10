@@ -4,18 +4,22 @@
 extern std::shared_ptr <Game> gameGlobal;
 
 Graph::Graph(){
-    n = 40;
-    init(n);
+    pHead = nullptr;
+}
+
+void copyNode(std::shared_ptr <Node> x, std::shared_ptr <Node> y){
+    if (y == nullptr)return;
+    x = std::make_shared <Node> (19.f, y->getString(), ResourceManager::getFont(), 
+                                    textSize, backgroundColor,sf::Vector2f(0,0),CIRCLE,2);
+    x->setText(y->getString());
+    for (int i = 0; i < y->childNode.size(); ++i)
+        copyNode(x->childNode[i].first, y->childNode[i].first);
 }
 
 Graph& Graph::operator=(Graph& other) {
     if (this != &other) { 
-        this->init(other.getSize());
-        for (int i = 0; i < other.getSize(); ++i)
-            this->listNode[i]->setText(other.listNode[i]->getString());
-        this->numValue = other.numValue;
-        // std::cout << this->getSize() << '\n';
-        // for (int i = 0; i < this->getSize(); ++i)std::cout << this->listNode[i]->getValue() << ' '; std::cout << '\n';
+        this->pHead = nullptr;
+        copyNode(this->pHead, other.pHead);
     }
     return *this;
 }
@@ -73,15 +77,6 @@ void Graph::setValue(int vtx, int value){
 }
 
 void Graph::setSize(int nn){n = nn;}
-
-std::string convertIntString(int x){
-    std::string res = "";
-    while (x){
-        res = (char)(x%10 +'0') + res;
-        x /= 10;
-    }
-    return res;
-}
 
 int Graph::randomNodeValue(){
     int t = ResourceManager::random(1,maxValue);
@@ -189,36 +184,11 @@ void Graph::getStep(int dx){
 //     // std::cout << stepNode.size() << '\n';
 // }
 
-void Graph::setSearchingNode(int vtx, float ratio){
-    listNode[vtx]->setOutlineColor(ResourceManager::changeColor(sf::Color::Black, SearchingNodeColor, ratio));
-    listNode[vtx]->setNodeColor(ResourceManager::changeColor(FirstNodeColor, SearchingNodeColor, ratio));
-    listNode[vtx]->setTextColor(ResourceManager::changeColor(textColorStart, textColorEnd, ratio));
-    // if (vtx && typeGraph != Graph)setArrowColor(vtx-1, ratio);
-}
-
-void Graph::removeSearchingNode(int vtx, float ratio){
-    listNode[vtx]->setNodeColor(ResourceManager::changeColor(SearchingNodeColor, FirstNodeColor, ratio));
-    listNode[vtx]->setTextColor(ResourceManager::changeColor(textColorEnd, SearchingNodeColor, ratio));
-}
-
-void Graph::setFoundNode(int vtx, float ratio){
-    listNode[vtx]->setOutlineColor(ResourceManager::changeColor(SearchingNodeColor, FoundNodeColor, ratio));
-    listNode[vtx]->setNodeColor(ResourceManager::changeColor(SearchingNodeColor, FoundNodeColor, ratio));
-    listNode[vtx]->setTextColor(ResourceManager::changeColor(textColorEnd, textColorEnd, ratio));
-}
-
-void Graph::removeFoundNode(int vtx, float ratio){
-    listNode[vtx]->setOutlineColor(FoundNodeColor);
-    listNode[vtx]->setNodeColor(backgroundColor);
-    listNode[vtx]->setTextColor(FoundNodeColor);
-    // gameGlobal->runBreak();
-}
-
 void Graph::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     // std::cout << stepImageSprite.getTexture()->getSize().x << '\n';
-    target.draw(highlight);
-    if (isListNew)for (int i = 0; i < listNew.size(); ++i)target.draw(*listNew[i]);
-    if (newNode != nullptr)target.draw(*newNode);
-    if (listNode.empty())return;
-    for (int i = 0; i < n; ++i)target.draw(*listNode[i]);
+    // target.draw(highlight);
+    // if (isListNew)for (int i = 0; i < listNew.size(); ++i)target.draw(*listNew[i]);
+    // if (newNode != nullptr)target.draw(*newNode);
+    if (pHead)target.draw(*pHead);
+
 }

@@ -167,6 +167,7 @@ void Node::changeSizeNode(float rad){
 }
 
 void Node::setPosition(sf::Vector2f position){
+    // std::cout << "position: " <<position.x << ' ' << position.y << '\n';
     m_position = position;
     if (typeNode)m_circle.setPosition(position);
         else m_rectangle.setPosition(position);
@@ -217,6 +218,31 @@ void Node::setPartialColor(float ratio, int id){
     childNode[id].second.setPartialColor(ratio);
 }
 
+void Node::setSearching(float ratio){
+    setOutlineColor(ResourceManager::changeColor(sf::Color::Black, SearchingNodeColor, ratio));
+    setNodeColor(ResourceManager::changeColor(FirstNodeColor, SearchingNodeColor, ratio));
+    setTextColor(ResourceManager::changeColor(textColorStart, textColorEnd, ratio));
+    // if (vtx && typeGraph != Graph)setArrowColor(vtx-1, ratio);
+}
+
+void Node::removeSearching(float ratio){
+    setNodeColor(ResourceManager::changeColor(SearchingNodeColor, FirstNodeColor, ratio));
+    setTextColor(ResourceManager::changeColor(textColorEnd, SearchingNodeColor, ratio));
+}
+
+void Node::setFound(float ratio){
+    setOutlineColor(ResourceManager::changeColor(SearchingNodeColor, FoundNodeColor, ratio));
+    setNodeColor(ResourceManager::changeColor(SearchingNodeColor, FoundNodeColor, ratio));
+    setTextColor(ResourceManager::changeColor(textColorEnd, textColorEnd, ratio));
+}
+
+void Node::removeFound(float ratio){
+    setOutlineColor(FoundNodeColor);
+    setNodeColor(backgroundColor);
+    setTextColor(FoundNodeColor);
+    // gameGlobal->runBreak();
+}
+
 void Node::rotateNextArrow(float degrees, int id){
     childNode[id].second.setRotation(degrees);
     float dx = 0, dy = 0;
@@ -256,11 +282,13 @@ void Node::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
     if (typeNode)target.draw(m_circle, states);
         target.draw(m_rectangle, states);
-    for (auto i : childNode)if (i.first)target.draw(i.second, states);
     target.draw(m_text, states);
     for (const auto& text : m_text_directions)
     {
         target.draw(text, states);
+    }
+    for (auto i : childNode){
+        if (i.first)target.draw(*i.first, states);
     }
 }
        

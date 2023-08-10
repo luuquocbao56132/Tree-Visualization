@@ -74,15 +74,6 @@ void Array::setValue(int vtx, int value){
 
 void Array::setSize(int nn){n = nn;}
 
-std::string convertIntString(int x){
-    std::string res = "";
-    while (x){
-        res = (char)(x%10 +'0') + res;
-        x /= 10;
-    }
-    return res;
-}
-
 int Array::randomNodeValue(){
     int t = ResourceManager::random(1,maxValue);
     return t;
@@ -101,11 +92,6 @@ void Array::setNodeColor(int vtx, sf::Color color){
 }
 
 int Array::getValue(int vtx){return listNode[vtx]->getValue();}
-
-void Array::setArrowColor(int vtx, float ratio){
-    //if (listNode[vtx]->)
-    listNode[vtx]->setPartialColor(ratio);
-}
 
 void Array::delValue(int vtx){
     int j = vtx % getSize();
@@ -151,49 +137,48 @@ void Array::getStep(int dx){
     // if (newNode)newNode->setArrow();
 }
 
-void Array::saveStep(){
-    std::vector <std::shared_ptr <Node> > res;
+// void Array::saveStep(){
+//     std::vector <std::shared_ptr <Node> > res;
 
-    if (newNode == nullptr)stepNewNode.push_back(nullptr);
-        else stepNewNode.push_back(std::make_shared <Node> (*newNode));
-    for (int i = 0; i < getSize(); ++i)res.push_back(std::make_shared <Node> (*listNode[i]));
+//     if (newNode == nullptr)stepNewNode.push_back(nullptr);
+//         else stepNewNode.push_back(std::make_shared <Node> (*newNode));
+//     for (int i = 0; i < getSize(); ++i)res.push_back(std::make_shared <Node> (*listNode[i]));
 
-    for (int i = 0; i < getSize(); ++i){
-        if (i > 0 && listNode[i]->prevNode == listNode[i-1])
-            res[i]->prevNode = res[i-1];
-        if (i < getSize()-1 && listNode[i]->nextNode == listNode[i+1])
-            res[i]->nextNode = res[i+1];
+//     for (int i = 0; i < getSize(); ++i){
+//         if (i > 0 && listNode[i]->prevNode == listNode[i-1])
+//             res[i]->prevNode = res[i-1];
+//         if (i < getSize()-1 && listNode[i]->nextNode == listNode[i+1])
+//             res[i]->nextNode = res[i+1];
         
-        if (listNode[i]->nextNode == newNode) 
-            res[i]->nextNode = stepNewNode[stepNewNode.size()-1];
-        if (listNode[i]->prevNode == newNode) 
-            res[i]->prevNode = stepNewNode[stepNewNode.size()-1];
+//         if (listNode[i]->nextNode == newNode) 
+//             res[i]->nextNode = stepNewNode[stepNewNode.size()-1];
+//         if (listNode[i]->prevNode == newNode) 
+//             res[i]->prevNode = stepNewNode[stepNewNode.size()-1];
 
-        if (newNode){
-            if (newNode->prevNode == listNode[i])
-                stepNewNode[stepNewNode.size()-1]->prevNode = res[i];
-            if (newNode->nextNode == listNode[i])
-                stepNewNode[stepNewNode.size()-1]->nextNode = res[i]; 
-        }
-    }
+//         if (newNode){
+//             if (newNode->prevNode == listNode[i])
+//                 stepNewNode[stepNewNode.size()-1]->prevNode = res[i];
+//             if (newNode->nextNode == listNode[i])
+//                 stepNewNode[stepNewNode.size()-1]->nextNode = res[i]; 
+//         }
+//     }
 
-    stepNode.push_back(res); ++nowStep;
-    stepString.push_back(highlight.getLine()+1);
+//     stepNode.push_back(res); ++nowStep;
+//     stepString.push_back(highlight.getLine()+1);
 
-    stepIsListNew.push_back(isListNew);
-    res.clear();
-    if (isListNew){
-        for (int i = 0; i < listNew.size(); ++i)
-            res.push_back(std::make_shared <Node> (*listNew[i]));
-    } stepListNew.push_back(res);
-    // std::cout << stepNode.size() << '\n';
-}
+//     stepIsListNew.push_back(isListNew);
+//     res.clear();
+//     if (isListNew){
+//         for (int i = 0; i < listNew.size(); ++i)
+//             res.push_back(std::make_shared <Node> (*listNew[i]));
+//     } stepListNew.push_back(res);
+//     // std::cout << stepNode.size() << '\n';
+// }
 
 void Array::setSearchingNode(int vtx, float ratio){
     listNode[vtx]->setOutlineColor(ResourceManager::changeColor(sf::Color::Black, SearchingNodeColor, ratio));
     listNode[vtx]->setNodeColor(ResourceManager::changeColor(FirstNodeColor, SearchingNodeColor, ratio));
     listNode[vtx]->setTextColor(ResourceManager::changeColor(textColorStart, textColorEnd, ratio));
-    if (vtx && typeArray != ARRAY)setArrowColor(vtx-1, ratio);
 }
 
 void Array::removeSearchingNode(int vtx, float ratio){

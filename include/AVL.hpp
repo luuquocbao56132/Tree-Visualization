@@ -15,8 +15,11 @@ public:
     int getBalance(std::shared_ptr <Node>);
     std::shared_ptr <Node> leftRotate(std::shared_ptr <Node> );
     std::shared_ptr <Node> rightRotate(std::shared_ptr <Node> );
-    std::shared_ptr <Node> newNode(int, std::shared_ptr <Node>);
+    Node newNode(int, std::shared_ptr <Node>);
     void insertNode(int);
+    void getList(std::shared_ptr <Node>);
+    void balancePosition();
+    void setVerticalPosition(std::shared_ptr <Node>, int);
     void draw(sf::RenderTarget& , sf::RenderStates ) const override;
     void insert(int);
     void remove(int);
@@ -26,6 +29,7 @@ public:
     void fromfile();
 
     Graph graph, firstGraph;
+    std::vector< std::pair < int, std::shared_ptr <Node> > > listNode;
 };
 
 #endif // AVL_hpp

@@ -8,6 +8,7 @@ std::string theme = (typeTheme == 0 ? "" : "1");
 std::shared_ptr <Game> gameGlobal;
 
 int main() {
+    // freopen("log.txt", "w", stdout);
     srand(time(NULL));
     std::cout << "Typetheme: " << (int)TextColor[typeTheme].r << " " << (int)TextColor[typeTheme].g << " " << (int)TextColor[typeTheme].b << '\n';
     gameGlobal = std::make_shared <Game> ();

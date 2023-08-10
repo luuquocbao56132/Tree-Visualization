@@ -3,7 +3,6 @@
 
 #include <BaseHeader.hpp>
 #include <DynArrow.hpp>
-#include <CircleArrow.hpp>
 
 class Node;
 
@@ -23,6 +22,12 @@ public:
     void setNodeColor(sf::Color );
     void setOutlineColor(sf::Color );
     void setTextColor(sf::Color );
+
+    void setSearching(float);
+    void setDel(float);
+    void removeSearching(float);
+    void setFound(float);
+    void removeFound(float);
 
     void setDirectionColor(const sf::Color& , unsigned int );
 
