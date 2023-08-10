@@ -93,6 +93,8 @@ DataTypes::DataTypes():
 
 void DataTypes::checkFunction(){
 }
+void DataTypes::checkFunctionFast(){
+}
 
 void DataTypes::clearQueue(){
     while (!funcQueue.empty())funcQueue.pop();

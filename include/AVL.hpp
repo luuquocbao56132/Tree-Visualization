@@ -15,8 +15,9 @@ public:
     int getBalance(std::shared_ptr <Node>);
     std::shared_ptr <Node> leftRotate(std::shared_ptr <Node> );
     std::shared_ptr <Node> rightRotate(std::shared_ptr <Node> );
-    Node newNode(int, std::shared_ptr <Node>);
-    void insertNode(int);
+    std::shared_ptr <Node> newNode(int, std::shared_ptr <Node>);
+    void resetNode(std::shared_ptr <Node> );
+    int getHeight(std::shared_ptr <Node> );
     void getList(std::shared_ptr <Node>);
     void balancePosition();
     void setVerticalPosition(std::shared_ptr <Node>, int);
@@ -25,6 +26,7 @@ public:
     void remove(int);
     void search(int);
     void checkFunction() override;
+    void checkFunctionFast() override;
     void checkPress(sf::Vector2f ) override;
     void fromfile();
 

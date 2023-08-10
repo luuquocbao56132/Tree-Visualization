@@ -19,6 +19,7 @@ public:
     void setTheme();
     void clearQueue();
     virtual void checkFunction();
+    virtual void checkFunctionFast();
     virtual void checkPress(sf::Vector2f);
     // virtual void resetAll();
     std::vector <std::shared_ptr<Button>> BaseButton, functionButton;

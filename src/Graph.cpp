@@ -8,17 +8,17 @@ Graph::Graph(){
 }
 
 void copyNode(std::shared_ptr <Node> x, std::shared_ptr <Node> y){
-    if (y == nullptr)return;
-    x = std::make_shared <Node> (19.f, y->getString(), ResourceManager::getFont(), 
+    if (y == nullptr){x = nullptr; return;}
+    if (x == nullptr)x = std::make_shared <Node> (19.f, y->getString(), ResourceManager::getFont(), 
                                     textSize, backgroundColor,sf::Vector2f(0,0),CIRCLE,2);
     x->setText(y->getString());
+    x->changeSizeNode(x->getRad() - CircleRad);
     for (int i = 0; i < y->childNode.size(); ++i)
         copyNode(x->childNode[i].first, y->childNode[i].first);
 }
 
 Graph& Graph::operator=(Graph& other) {
-    if (this != &other) { 
-        this->pHead = nullptr;
+    if (this != &other) {
         copyNode(this->pHead, other.pHead);
     }
     return *this;

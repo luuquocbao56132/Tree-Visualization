@@ -1,14 +1,23 @@
 #include <AVL.hpp>
 
-void resetSize(std::shared_ptr <Node> x){
-    x->changeSizeNode(x->getRad()-CircleRad);
+void AVL::resetNode(std::shared_ptr <Node> x){
+    if (x == nullptr)return;
+    Node t = *x;
+    *x = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, sf::Vector2f(0,0), CIRCLE, 2);
+    for (int i = 0; i < t.childNode.size(); ++i)
+        x->childNode[i].first = t.childNode[i].first;
+    // x->changeSizeNode(x->getRad() - CircleRad);
+    // x->setDefaultColor();
+    resetNode(x->childNode[0].first);
+    resetNode(x->childNode[1].first);
 }
 
 AVL::AVL(): DataTypes(), graph(){
     initGraph();
     clearQueue();
-    // resetSize(graph.pHead);
-    firstGraph = graph;
+    resetNode(graph.pHead);
+    balancePosition();
+    checkFunctionFast();
 }
 
 void AVL::initGraph(){
@@ -29,9 +38,24 @@ void AVL::checkFunction(){
     ani.go();
 }
 
+void AVL::checkFunctionFast(){
+    DataTypes::checkFunctionFast();
+    while (!funcQueue.empty()){
+    // std::cout << funcQueue.size() << '\n';
+    Animation ani = funcQueue.front();
+    funcQueue.pop();
+    ani.go();
+    }
+}
+
+int AVL::getHeight(std::shared_ptr <Node> t){
+    if (t == nullptr)return 0;
+    return t->getHeight();
+}
+
 int AVL::getBalance(std::shared_ptr <Node> t){
     if (t == nullptr)return 0;
-    return t->childNode[0].first->getHeight() - t->childNode[1].first->getHeight();
+    return getHeight(t->childNode[0].first) - getHeight(t->childNode[1].first);
 }
 
 std::shared_ptr <Node> AVL::leftRotate(std::shared_ptr <Node> x){
@@ -41,8 +65,8 @@ std::shared_ptr <Node> AVL::leftRotate(std::shared_ptr <Node> x){
     x->childNode[1].first = T2;
     if (T2 != nullptr)T2->prevNode = x; 
     y->prevNode = x->prevNode; x->prevNode = y;
-    x->setHeight(1 + std::max(x->childNode[0].first->getHeight(), x->childNode[1].first->getHeight()));
-    y->setHeight(1 + std::max(y->childNode[0].first->getHeight(), y->childNode[1].first->getHeight()));
+    x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
+    y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
     return y;
 }
 
@@ -53,8 +77,8 @@ std::shared_ptr <Node> AVL::rightRotate(std::shared_ptr <Node> x){
     x->childNode[0].first = T2;
     if (T2 != nullptr)T2->prevNode = x;
     y->prevNode = x->prevNode; x->prevNode = y;
-    x->setHeight(1 + std::max(x->childNode[0].first->getHeight(), x->childNode[1].first->getHeight()));
-    y->setHeight(1 + std::max(y->childNode[0].first->getHeight(), y->childNode[1].first->getHeight()));
+    x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
+    y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
     return y;
 }
 
@@ -73,39 +97,41 @@ void AVL::setVerticalPosition(std::shared_ptr <Node> t, int k){
 }
 
 void AVL::balancePosition(){
-    setVerticalPosition(graph.pHead, 200);
-    graph.pHead->setPosition(sf::Vector2f(0.f, 200));
+    setVerticalPosition(graph.pHead, 130);
+
     listNode.clear();
     getList(graph.pHead);
     std::sort(listNode.begin(), listNode.end());
     for (int i = 0; i < listNode.size(); ++i){
         float k = listNode[i].second->getNodePosition().y;
         // std::cout << k << '\n';
-        listNode[i].second->setPosition(sf::Vector2f(120 + 50*i, k));
+        listNode[i].second->setPosition(sf::Vector2f(120 + 60*i, k));
     }
     listNode.clear();
 }
 
-Node AVL::newNode(int k, std::shared_ptr <Node> t){
-    Node nod = Node(19.f, std::to_string(k), ResourceManager::getFont(), 
+std::shared_ptr <Node> AVL::newNode(int k, std::shared_ptr <Node> t){
+    std::shared_ptr <Node> nod = std::make_shared <Node> (19.f, std::to_string(k), ResourceManager::getFont(), 
                         textSize, backgroundColor,sf::Vector2f(0,0),CIRCLE,2);
-    funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, CircleRad)},{},{},{}));
+    nod->changeSizeNode(CircleRad);
     for (int i = 1; i <= 60; ++i)
-            funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, -CircleRad/60.f)},{},{},{}));
-    funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, nod.getRad()-CircleRad)},{},{},{}));
-    nod.prevNode = t;
+            funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, -CircleRad/60.f),
+                                    std::bind(&Node::setSearching, nod, i/60.f)},{},{},{}));
+    // funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, nod->getRad()-CircleRad)},{},{},{}));
+    nod->prevNode = t;
     return nod;
 }
 
 void AVL::insert(int k){
-    clearQueue();
+    clearQueue(); resetNode(graph.pHead); balancePosition(); checkFunctionFast(); 
+    // if (graph.pHead != nullptr)std::cout << "position: " << graph.pHead->getPosition().x << '\n';
 
     std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
     int idx = 0;
     while (true){
         if (t == nullptr){
-            if (graph.pHead == nullptr) graph.pHead = std::make_shared <Node> (newNode(k, preNode)); 
-                else t = std::make_shared <Node> (newNode(k, preNode)), preNode->childNode[idx].first = t; 
+            if (graph.pHead == nullptr) graph.pHead = newNode(k, preNode); 
+                else t = newNode(k, preNode), preNode->childNode[idx].first = t; 
             // auto insertNode = [this, k, &preNode, &t, &idx]() {
             //     if (graph.pHead == nullptr) {
             //         graph.pHead = std::make_shared<Node>(newNode(k, preNode));
@@ -116,10 +142,10 @@ void AVL::insert(int k){
             // };
 
             // funcQueue.push(Animation({}, {}, {}, {insertNode}));
-            std::cout << t << " " << preNode << '\n';
+            // std::cout << t << " " << preNode << '\n';
             break;
         }
-        std::cout << t->getValue() << '\n';
+        // std::cout << t->getValue() << '\n';
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
         if (k < t->getValue()){
@@ -132,28 +158,27 @@ void AVL::insert(int k){
                 funcQueue.push(Animation({std::bind(&Node::removeSearching, t, i/60.f)},{},{},{}));
             preNode = t; t = t->childNode[1].first; idx = 1;
         } else break;
-        for (int i = 1; i <= 60; ++i)
-                funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
+        // for (int i = 1; i <= 60; ++i)
+        //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
     }
-    // while (t != nullptr){
-    //     t->setHeight(1 + std::max(t->childNode[0].first->getHeight(), t->childNode[1].first->getHeight()));
-    //     int balance = getBalance(t);
-    //     std::shared_ptr <Node> leftChild = t->childNode[0].first, rightChild = t->childNode[1].first;
-    //     if (balance > 1 && getBalance(leftChild) > 0){
-    //         t = rightRotate(t);
-    //     } else if (balance < -1 && getBalance(rightChild) < 0){
-    //         t = leftRotate(t);
-    //     } else if (balance > 1 && getBalance(leftChild) < 0){
-    //         t->childNode[0].first = leftRotate(leftChild);
-    //         t = rightRotate(t);
-    //     } else if (balance < -1 && getBalance(rightChild) > 0){
-    //         t->childNode[1].first = rightRotate(rightChild);
-    //         t = leftRotate(t);
-    //     } 
-    //     t = t->prevNode;
-    // }
+    while (t != nullptr){
+        int balance = getBalance(t);
+        std::shared_ptr <Node> leftChild = t->childNode[0].first, rightChild = t->childNode[1].first;
+        if (balance > 1 && getBalance(leftChild) > 0){
+            t = rightRotate(t);
+        } else if (balance < -1 && getBalance(rightChild) < 0){
+            t = leftRotate(t);
+        } else if (balance > 1 && getBalance(leftChild) < 0){
+            t->childNode[0].first = leftRotate(leftChild);
+            t = rightRotate(t);
+        } else if (balance < -1 && getBalance(rightChild) > 0){
+            t->childNode[1].first = rightRotate(rightChild);
+            t = leftRotate(t);
+        } 
+        t->setHeight(1 + std::max(getHeight(t->childNode[0].first), getHeight(t->childNode[1].first)));
+        t = t->prevNode;
+    }
     balancePosition();
-    // firstGraph = graph;
 }
 
 void AVL::fromfile(){

@@ -159,11 +159,13 @@ void Node::changeSizeNode(float rad){
     }
 
     // m_text.setCharacterSize(std::min(std::ceil(m_text.getCharacterSize()*rate), textSize));
-    m_text.setCharacterSize(m_radius/CircleRad * textSize);
+    if (m_radius == 0)m_text.setCharacterSize(0);
+        else m_text.setCharacterSize(textSize);
     m_text.setPosition(position);
-    for (int i = 0; i < 4; ++i)m_text_directions[i].setCharacterSize(std::min(std::ceil(m_text_directions[i].getCharacterSize()*rate), textSize));
+    for (int i = 0; i < 4; ++i) if (m_radius == 0)m_text_directions[i].setCharacterSize(0);
+        else m_text_directions[i].setCharacterSize(textSize);
     
-    for (auto i : childNode)i.second.minimizeArrow(i.second.getLength() - i.second.getLength()*rate); 
+    // for (auto i : childNode)i.second.minimizeArrow(i.second.getLength() - i.second.getLength()*rate); 
 }
 
 void Node::setPosition(sf::Vector2f position){
@@ -176,7 +178,6 @@ void Node::setPosition(sf::Vector2f position){
     m_text_directions[BOT].setPosition(sf::Vector2f(position.x, position.y + CircleRad + textSize));
     m_text_directions[LEFT].setPosition(sf::Vector2f(position.x - CircleRad - textSize, position.y));
     for (auto i : childNode)i.second = DynArrow(60, sf::Color::Black, sf::Vector2f(position.x + CircleRad + 3, position.y), 0.f);
-    //prevArrow.setRotation(180);
     m_text.setPosition(m_position);
 }
 
