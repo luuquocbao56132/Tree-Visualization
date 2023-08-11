@@ -6,6 +6,8 @@ void AVL::resetNode(std::shared_ptr <Node> x){
     *x = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, sf::Vector2f(0,0), CIRCLE, 2);
     for (int i = 0; i < t.childNode.size(); ++i)
         x->childNode[i].first = t.childNode[i].first;
+    x->prevNode = t.prevNode;
+    x->setHeight(t.getHeight());
     // x->changeSizeNode(x->getRad() - CircleRad);
     // x->setDefaultColor();
     resetNode(x->childNode[0].first);
@@ -22,9 +24,10 @@ AVL::AVL(): DataTypes(), graph(){
 
 void AVL::initGraph(){
     int n = ResourceManager::random(5, 12);
+    // std::vector <int> t = {30,29,28,27,26};
+    // for (int i : t)insert(i);
     for(int i = 1; i <= n; ++i){
         int k = ResourceManager::random(1, 99);
-        std::cout << "pHead: " << graph.pHead << " k: " << k << '\n';
         insert(k);
     }
 }
@@ -65,6 +68,10 @@ std::shared_ptr <Node> AVL::leftRotate(std::shared_ptr <Node> x){
     x->childNode[1].first = T2;
     if (T2 != nullptr)T2->prevNode = x; 
     y->prevNode = x->prevNode; x->prevNode = y;
+    if (y->prevNode != nullptr)
+        for (int i = 0; i < y->prevNode->childNode.size(); ++i)
+            if (y->prevNode->childNode[i].first == x)
+                y->prevNode->childNode[i].first = y;
     x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
     y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
     return y;
@@ -77,6 +84,10 @@ std::shared_ptr <Node> AVL::rightRotate(std::shared_ptr <Node> x){
     x->childNode[0].first = T2;
     if (T2 != nullptr)T2->prevNode = x;
     y->prevNode = x->prevNode; x->prevNode = y;
+    if (y->prevNode != nullptr)
+        for (int i = 0; i < y->prevNode->childNode.size(); ++i)
+            if (y->prevNode->childNode[i].first == x)
+                y->prevNode->childNode[i].first = y;
     x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
     y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
     return y;
@@ -85,6 +96,7 @@ std::shared_ptr <Node> AVL::rightRotate(std::shared_ptr <Node> x){
 void AVL::getList(std::shared_ptr <Node> x){
     if (x == nullptr)return;
     listNode.push_back({x->getValue(),x});
+    // std::cout << x->getValue() << ' ';
     getList(x->childNode[0].first);
     getList(x->childNode[1].first);
 }
@@ -100,7 +112,8 @@ void AVL::balancePosition(){
     setVerticalPosition(graph.pHead, 130);
 
     listNode.clear();
-    getList(graph.pHead);
+    getList(graph.pHead); 
+    // std::cout << '\n';
     std::sort(listNode.begin(), listNode.end());
     for (int i = 0; i < listNode.size(); ++i){
         float k = listNode[i].second->getNodePosition().y;
@@ -119,19 +132,30 @@ std::shared_ptr <Node> AVL::newNode(int k, std::shared_ptr <Node> t){
                                     std::bind(&Node::setSearching, nod, i/60.f)},{},{},{}));
     // funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, nod->getRad()-CircleRad)},{},{},{}));
     nod->prevNode = t;
+    nod->setHeight(1);
+    // std::cout << "newNode: " << nod->prevNode << " " << t << '\n';
     return nod;
 }
 
+void getHeightAll(std::shared_ptr <Node> t){
+    if (t == nullptr)return;
+    std::cout << "t: " << t->getValue() << " height: " << t->getHeight() << '\n';
+    getHeightAll(t->childNode[0].first);
+    getHeightAll(t->childNode[1].first);
+}
+ 
 void AVL::insert(int k){
     clearQueue(); resetNode(graph.pHead); balancePosition(); checkFunctionFast(); 
-    // if (graph.pHead != nullptr)std::cout << "position: " << graph.pHead->getPosition().x << '\n';
-
+    std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
     std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
     int idx = 0;
     while (true){
+        // std::cout << "out " << t << " ";
+        // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
         if (t == nullptr){
             if (graph.pHead == nullptr) graph.pHead = newNode(k, preNode); 
-                else t = newNode(k, preNode), preNode->childNode[idx].first = t; 
+                else t = newNode(k, preNode), preNode->childNode[idx].first = t;
+                // std::cout << "newNode2: "<< t << " " << t->prevNode << " " << preNode << '\n';
             // auto insertNode = [this, k, &preNode, &t, &idx]() {
             //     if (graph.pHead == nullptr) {
             //         graph.pHead = std::make_shared<Node>(newNode(k, preNode));
@@ -161,11 +185,22 @@ void AVL::insert(int k){
         // for (int i = 1; i <= 60; ++i)
         //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
     }
+
     while (t != nullptr){
         int balance = getBalance(t);
+        // std::cout << t << " " << t->getValue() << " " << balance << '\n';
         std::shared_ptr <Node> leftChild = t->childNode[0].first, rightChild = t->childNode[1].first;
+
+        // std::cout << "t: " << (t == nullptr ? 0 : t->getValue()) 
+        //             << " left: " << (leftChild == nullptr ? 0 : leftChild->getValue())
+        //             << " right: " << (rightChild == nullptr ? 0 : rightChild->getValue()) << '\n';
+        // std::cout << "leftHeight: " << (leftChild == nullptr ? 0 : getHeight(leftChild)) 
+        //             << " rightHeight: " << (rightChild == nullptr ? 0 : getHeight(rightChild)) << '\n';
+        
         if (balance > 1 && getBalance(leftChild) > 0){
+            // std::cout << t << " " << leftChild << " " << rightChild << '\n';
             t = rightRotate(t);
+            // std::cout << t << " " << leftChild << " " << rightChild << '\n';
         } else if (balance < -1 && getBalance(rightChild) < 0){
             t = leftRotate(t);
         } else if (balance > 1 && getBalance(leftChild) < 0){
@@ -176,8 +211,16 @@ void AVL::insert(int k){
             t = leftRotate(t);
         } 
         t->setHeight(1 + std::max(getHeight(t->childNode[0].first), getHeight(t->childNode[1].first)));
+        std::cout << "t: " << (t == nullptr ? 0 : t->getValue()) << '\n';
+        for (int i = 0; i < t->childNode.size(); ++i)
+            if (t->childNode[i].first == graph.pHead){
+                graph.pHead = t;
+                break;
+            }
         t = t->prevNode;
+        balancePosition();
     }
+    // getHeightAll(graph.pHead);
     balancePosition();
 }
 
