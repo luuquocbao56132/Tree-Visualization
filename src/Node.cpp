@@ -8,6 +8,7 @@ Node::Node(float radius, const std::string& text, const sf::Font& font, float te
     m_position(position),
     m_text(text, font, text_size),
     H(1), typeNode(type),
+    positionSpeed(sf::Vector2f(0,0)),
     m_text_directions {sf::Text("", font, text_size), sf::Text("",font,text_size), sf::Text("",font,text_size), sf::Text("",font,text_size)}
 {
         // Set the position and color of the circle shape
@@ -59,6 +60,7 @@ Node::Node(float radius, const std::string& text, const sf::Font& font, float te
     m_position(position),
     m_text(text, font, text_size),
     H(1), typeNode(type),
+    positionSpeed(sf::Vector2f(0,0)),
     m_text_directions {sf::Text("", font, text_size), sf::Text("",font,text_size), sf::Text("",font,text_size), sf::Text("",font,text_size)}
 {
         // Set the position and color of the circle shape
@@ -168,9 +170,25 @@ void Node::changeSizeNode(float rad){
     // for (auto i : childNode)i.second.minimizeArrow(i.second.getLength() - i.second.getLength()*rate); 
 }
 
+void Node::setPosSpeed(sf::Vector2f x, sf::Vector2f y){
+    positionSpeed = sf::Vector2f((y.x - x.x) / numFrame, (y.y - x.y) / numFrame);
+}
+
+void Node::checkPosition(){
+    sf::Vector2f speed = (m_position - getNodePosition()) * 0.05f;
+    if (std::max(abs(m_position.x - getNodePosition().x), abs(m_position.y - getNodePosition().y)) > EPS)
+        setPosition(getNodePosition() + speed);
+
+    if (childNode[0].first != nullptr)childNode[0].first -> checkPosition();
+    if (childNode[1].first != nullptr)childNode[1].first -> checkPosition();
+}
+
+void Node::changePosition(sf::Vector2f position){
+    m_position = position;
+}
+
 void Node::setPosition(sf::Vector2f position){
     // std::cout << "position: " <<position.x << ' ' << position.y << '\n';
-    m_position = position;
     if (typeNode)m_circle.setPosition(position);
         else m_rectangle.setPosition(position);
     m_text_directions[TOP].setPosition(sf::Vector2f(position.x, position.y - CircleRad - textSize));
@@ -178,7 +196,7 @@ void Node::setPosition(sf::Vector2f position){
     m_text_directions[BOT].setPosition(sf::Vector2f(position.x, position.y + CircleRad + textSize));
     m_text_directions[LEFT].setPosition(sf::Vector2f(position.x - CircleRad - textSize, position.y));
     for (auto i : childNode)i.second = DynArrow(60, sf::Color::Black, sf::Vector2f(position.x + CircleRad + 3, position.y), 0.f);
-    m_text.setPosition(m_position);
+    m_text.setPosition(position);
 }
 
 void Node::setArrow(){

@@ -10,11 +10,12 @@
 class AVL: public DataTypes {
 public:
     AVL();
-    void initGraph();
-    void checkBalance();
+    void initGraph(int);
+    void checkBalance(std::shared_ptr <Node> );
+    void checkBalanceInt(int);
     int getBalance(std::shared_ptr <Node>);
-    std::shared_ptr <Node> leftRotate(std::shared_ptr <Node> );
-    std::shared_ptr <Node> rightRotate(std::shared_ptr <Node> );
+    void leftRotate(int, int );
+    void rightRotate(int, int );
     std::shared_ptr <Node> newNode(int, std::shared_ptr <Node>);
     void resetNode(std::shared_ptr <Node> );
     int getHeight(std::shared_ptr <Node> );

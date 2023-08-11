@@ -24,7 +24,7 @@ void HashTable::checkPress(sf::Vector2f mousePos){
                     inputBox[0]->checkPress(mousePos);
                     if (inputBox[0]->Go->checkPress(mousePos)){
                         clearQueue();
-                        graph.init();
+                        graph.init(inputBox[0]->getValue());
                         firstGraph = graph;
                     }
                 }

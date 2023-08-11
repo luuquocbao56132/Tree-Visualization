@@ -32,6 +32,9 @@ public:
     void setDirectionColor(const sf::Color& , unsigned int );
 
     void setPosition(sf::Vector2f );
+    void changePosition(sf::Vector2f);
+    void checkPosition();
+    void setPosSpeed(sf::Vector2f, sf::Vector2f);
 
     void setPartialColor(float , int);
 
@@ -62,6 +65,7 @@ public:
     std::shared_ptr <Node> prevNode;
 
     sf::Text m_text_directions[4];
+    sf::Vector2f positionSpeed, m_position;
     void updateCircle();
     void setCircle(bool);
     int numArrow, H;
@@ -70,7 +74,6 @@ private:
     sf::CircleShape m_circle;
     sf::RectangleShape m_rectangle;
     sf::Color m_color;
-    sf::Vector2f m_position;
     sf::Text m_text;
     float m_radius;
 };

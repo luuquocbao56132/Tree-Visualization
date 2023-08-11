@@ -1,0 +1,182 @@
+Typetheme: 237 242 245
+Game pointer: 0xe86e28
+charLength: 10charLength: 10charLength: 10charLength: 10pHead: 0 k = 77
+pHead: 77 k = 85
+t: 85 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 85
+t: 77 left: 0 right: 85
+leftHeight: 0 rightHeight: 1
+t: 77
+pHead: 77 k = 98
+t: 98 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 98
+t: 85 left: 0 right: 98
+leftHeight: 0 rightHeight: 1
+t: 85
+t: 77 left: 0 right: 85
+leftHeight: 0 rightHeight: 2
+t: 85
+pHead: 85 k = 75
+t: 75 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 75
+t: 77 left: 75 right: 0
+leftHeight: 1 rightHeight: 0
+t: 77
+t: 85 left: 77 right: 98
+leftHeight: 2 rightHeight: 1
+t: 85
+pHead: 85 k = 56
+t: 56 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 56
+t: 75 left: 56 right: 0
+leftHeight: 1 rightHeight: 0
+t: 75
+t: 77 left: 75 right: 0
+leftHeight: 2 rightHeight: 0
+t: 75
+t: 85 left: 77 right: 98
+leftHeight: 1 rightHeight: 1
+t: 85
+pHead: 85 k = 65
+t: 65 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 65
+t: 77 left: 65 right: 0
+leftHeight: 1 rightHeight: 0
+t: 77
+t: 75 left: 56 right: 77
+leftHeight: 1 rightHeight: 2
+t: 75
+t: 85 left: 77 right: 98
+leftHeight: 2 rightHeight: 1
+t: 85
+pHead: 85 k = 84
+t: 84 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 84
+t: 77 left: 65 right: 84
+leftHeight: 1 rightHeight: 1
+t: 77
+t: 75 left: 56 right: 77
+leftHeight: 1 rightHeight: 2
+t: 75
+t: 85 left: 77 right: 98
+leftHeight: 2 rightHeight: 1
+t: 85
+pHead: 85 k = 22
+t: 22 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 22
+t: 65 left: 22 right: 0
+leftHeight: 1 rightHeight: 0
+t: 65
+t: 77 left: 65 right: 84
+leftHeight: 2 rightHeight: 1
+t: 77
+t: 75 left: 56 right: 77
+leftHeight: 1 rightHeight: 3
+t: 65
+t: 85 left: 77 right: 98
+leftHeight: 2 rightHeight: 1
+t: 85
+pHead: 85 k = 70
+t: 70 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 70
+t: 77 left: 70 right: 84
+leftHeight: 1 rightHeight: 1
+t: 77
+t: 65 left: 75 right: 77
+leftHeight: 2 rightHeight: 2
+t: 65
+t: 85 left: 77 right: 98
+leftHeight: 2 rightHeight: 1
+t: 85
+liveData
+liveData
+pHead: 85 k = 60
+t: 60 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 60
+t: 70 left: 60 right: 0
+leftHeight: 1 rightHeight: 0
+t: 70
+t: 77 left: 70 right: 84
+leftHeight: 2 rightHeight: 1
+t: 77
+t: 65 left: 75 right: 77
+leftHeight: 2 rightHeight: 3
+t: 65
+t: 85 left: 77 right: 98
+leftHeight: 3 rightHeight: 1
+t: 77
+liveData
+liveData
+pHead: 77 k = 59
+t: 59 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 59
+t: 60 left: 59 right: 0
+leftHeight: 1 rightHeight: 0
+t: 60
+t: 70 left: 60 right: 0
+leftHeight: 2 rightHeight: 0
+t: 60
+t: 77 left: 70 right: 85
+leftHeight: 1 rightHeight: 2
+t: 77
+liveData
+liveData
+pHead: 77 k = 58
+t: 58 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 58
+t: 70 left: 58 right: 0
+leftHeight: 1 rightHeight: 0
+t: 70
+t: 60 left: 59 right: 70
+leftHeight: 1 rightHeight: 2
+t: 60
+t: 77 left: 70 right: 85
+leftHeight: 2 rightHeight: 2
+t: 77
+liveData
+liveData
+pHead: 77 k = 57
+t: 57 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 57
+t: 58 left: 57 right: 0
+leftHeight: 1 rightHeight: 0
+t: 58
+t: 70 left: 58 right: 0
+leftHeight: 2 rightHeight: 0
+t: 58
+t: 60 left: 59 right: 70
+leftHeight: 1 rightHeight: 1
+t: 60
+t: 77 left: 70 right: 85
+leftHeight: 1 rightHeight: 2
+t: 77
+liveData
+pHead: 77 k = 57
+t: 57 left: 0 right: 0
+leftHeight: 0 rightHeight: 0
+t: 57
+t: 70 left: 57 right: 0
+leftHeight: 1 rightHeight: 0
+t: 70
+t: 58 left: 57 right: 70
+leftHeight: 1 rightHeight: 2
+t: 58
+t: 60 left: 59 right: 70
+leftHeight: 1 rightHeight: 2
+t: 60
+t: 77 left: 70 right: 85
+leftHeight: 2 rightHeight: 2
+t: 77
+liveData

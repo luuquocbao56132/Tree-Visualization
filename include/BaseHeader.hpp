@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <Resource.hpp>
 #include <iostream>
+#include <algorithm>
 #include <Vector>
 #include <cmath>
 #include <math.h>
@@ -70,6 +71,7 @@ static sf::Color BlurNodeColor(62,62,62);
 static sf::Vector2f inputButtonSize = sf::Vector2f(60,50);
 static int maxValue = 99;
 static int maxSize = 15;
+static float EPS = 1e-6;
 static float timeLength = 1000;
 static float arrowLength = 60;
 static float nodeRadius = 19;
