@@ -1,20 +1,22 @@
 #include <AVL.hpp>
 
-void AVL::resetNode(std::shared_ptr <Node> x){
-    if (x == nullptr)return;
-    Node t = *x;
-    *x = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, sf::Vector2f(0,0), CIRCLE, 2);
+void AVL::resetNode(std::shared_ptr <Node> res){
+    if (res == nullptr)return;
+    Node t = *res;
+    *res = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, sf::Vector2f(0,0), CIRCLE, 2);
     for (int i = 0; i < t.childNode.size(); ++i)
-        x->childNode[i].first = t.childNode[i].first;
-    x->prevNode = t.prevNode;
-    x->setHeight(t.getHeight());
+        res->childNode[i].first = t.childNode[i].first,
+        res->childNode[i].second = DynArrow(60, sf::Color::Black, sf::Vector2f(res->getNodePosition().x + CircleRad + 3, res->getNodePosition().y), 0.f);
+    res->prevNode = t.prevNode;
+    res->setHeight(t.getHeight());
     // x->changeSizeNode(x->getRad() - CircleRad);
     // x->setDefaultColor();
-    resetNode(x->childNode[0].first);
-    resetNode(x->childNode[1].first);
+    resetNode(res->childNode[0].first);
+    resetNode(res->childNode[1].first);
 }
 
 AVL::AVL(): DataTypes(), graph(){
+    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (99));
     initGraph(ResourceManager::random(5, 12));
     clearQueue();
     resetNode(graph.pHead);
@@ -29,25 +31,19 @@ void AVL::initGraph(int n){
     for(int i = 1; i <= n; ++i){
         int k = ResourceManager::random(1, 99);
         insert(k);
+        balancePosition();
         checkFunctionFast(); 
     }
 }
 
 void checkPosition(std::shared_ptr <Node> n){
     if (n == nullptr)return;
-
-    // sf::Vector2f speed = (n->m_position - n->getPosition()) * 0.1f;
-    // if (std::max(abs(n->m_position.x - n->getPosition().x), abs(n->m_position.y - n->getPosition().y)) < EPS)
-    //     n->setPosition(n->getPosition() + speed);
-
     n->checkPosition();
 }
 
 void checkPositionFast(std::shared_ptr <Node> n){
     if (n == nullptr)return;
-    n->setPosition(n->m_position);
-    checkPositionFast(n->childNode[0].first);
-    checkPositionFast(n->childNode[1].first);
+    n->checkPositionFast();
 }
 
 void AVL::checkFunction(){
@@ -194,8 +190,8 @@ void AVL::getList(std::shared_ptr <Node> x){
 void AVL::setVerticalPosition(std::shared_ptr <Node> t, int k){
     if (t == nullptr)return;
     t->changePosition(sf::Vector2f(0.f, k));
-    setVerticalPosition(t->childNode[0].first, k + 40);
-    setVerticalPosition(t->childNode[1].first, k + 40);
+    setVerticalPosition(t->childNode[0].first, k + 50);
+    setVerticalPosition(t->childNode[1].first, k + 50);
 }
 
 void AVL::balancePosition(){
@@ -242,7 +238,11 @@ void AVL::insert(int k){
         // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
         if (t == nullptr){
             if (graph.pHead == nullptr) graph.pHead = newNode(k, preNode), t = graph.pHead; 
-                else t = newNode(k, preNode), preNode->childNode[idx].first = t;
+                else {
+                    t = newNode(k, preNode);
+                    preNode->childNode[idx].first = t;
+                    preNode->childNode[idx].second = DynArrow(60, sf::Color::Black, sf::Vector2f(preNode->getNodePosition().x + CircleRad + 3, preNode->getNodePosition().y), 0.f);
+                }
                 // std::cout << "newNode2: "<< t << " " << t->prevNode << " " << preNode << '\n';
             // auto insertNode = [this, k, &preNode, &t, &idx]() {
             //     if (graph.pHead == nullptr) {

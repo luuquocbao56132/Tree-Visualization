@@ -18,7 +18,7 @@ DynArrow::DynArrow(float length, sf::Color color, sf::Vector2f position, float a
     m_head.setPoint(2, sf::Vector2f(length-12, 7.5));
     m_head.setOrigin(length-12.f, 1.5f);
 
-    m_particle.setFillColor(SearchingNodeColor);
+    m_particle.setFillColor(sf::Color::Yellow);
     m_particle.setSize(sf::Vector2f(0.f,3.f));
     setPosition(position); 
 }
@@ -26,7 +26,6 @@ DynArrow::DynArrow(float length, sf::Color color, sf::Vector2f position, float a
 void DynArrow::setColor(const sf::Color& color){
     m_color = color;
     m_body.setFillColor(color);
-    m_head.setFillColor(color);
 }
 
 void DynArrow::setRotation(float degrees){
@@ -39,11 +38,6 @@ void DynArrow::setRotation(float degrees){
 void DynArrow::setPosition(sf::Vector2f position){
     m_body.setPosition(position);
     m_particle.setPosition(position);
-    //m_head.setPosition(sf::Vector2f(position.x+m_length-12,position.y+1.5f));
-    int triPosition = m_length - 12;
-    float Sinn = std::sin(m_body.getRotation() * M_PI / 180.f), Coss = std::cos(m_body.getRotation() * M_PI / 180.f);
-    m_head.setPosition(position.x + triPosition * Coss - 1.5*Sinn,
-                        position.y + triPosition * Sinn + 1.5*Coss);
 }
 
 void DynArrow::setPartialColor(float ratio){
@@ -52,20 +46,17 @@ void DynArrow::setPartialColor(float ratio){
 }
 
 void DynArrow::minimizeArrow(float length){
-    float ratio_particle = m_particle.getSize().x / m_length;
-    m_length -= length;
+    // std::cout << "m_length: " << m_length << " length: " << length << '\n'; 
+    float ratio_particle;
+    if (abs(m_length) < EPS)ratio_particle = 0; 
+        else ratio_particle = m_particle.getSize().x / m_length;
+    m_length = length;
+    // m_length = std::max(m_length,1.f);
     // std::cout << "mlength: " << m_length << '\n';
-    sf::Vector2f res = m_head.getPoint(0);
-    res = m_head.getPosition();
-    float Sinn = std::sin(m_body.getRotation() * M_PI / 180.f), Coss = std::cos(m_body.getRotation() * M_PI / 180.f);
-    m_head.setPosition(sf::Vector2f(res.x - length*Coss, res.y - length*Sinn));
 
-    res = m_body.getPosition();
+    sf::Vector2f res = m_body.getPosition();
     m_body.setSize(sf::Vector2f(m_length,3.f));
     if (m_particle.getSize().x > 0)m_particle.setSize(sf::Vector2f(m_length * ratio_particle, 3.f));
-
-    //std::cout << m_length << " " << length * Sinn << " " << res.x << '\n';
-
 }
 
 float DynArrow::getLength(){
@@ -78,7 +69,6 @@ float DynArrow::getAngle(){
 
 void DynArrow::draw(sf::RenderTarget& target, sf::RenderStates states) const{
     states.transform *= getTransform();
-    if (m_length < 12)return;
     target.draw(m_body, states);
     if (m_particle.getSize().y > 0)target.draw(m_particle, states);
 }

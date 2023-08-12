@@ -179,8 +179,18 @@ void Node::checkPosition(){
     if (std::max(abs(m_position.x - getNodePosition().x), abs(m_position.y - getNodePosition().y)) > EPS)
         setPosition(getNodePosition() + speed);
 
-    if (childNode[0].first != nullptr)childNode[0].first -> checkPosition();
-    if (childNode[1].first != nullptr)childNode[1].first -> checkPosition();
+    for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
+        childNode[i].first -> checkPosition();
+    }
+    setArrow();   
+}
+
+void Node::checkPositionFast(){
+    setPosition(m_position);
+    for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
+        childNode[i].first -> checkPositionFast();
+    }
+    setArrow();
 }
 
 void Node::changePosition(sf::Vector2f position){
@@ -195,16 +205,17 @@ void Node::setPosition(sf::Vector2f position){
     m_text_directions[RIGHT].setPosition(sf::Vector2f(position.x + CircleRad + textSize, position.y));
     m_text_directions[BOT].setPosition(sf::Vector2f(position.x, position.y + CircleRad + textSize));
     m_text_directions[LEFT].setPosition(sf::Vector2f(position.x - CircleRad - textSize, position.y));
-    for (auto i : childNode)i.second = DynArrow(60, sf::Color::Black, sf::Vector2f(position.x + CircleRad + 3, position.y), 0.f);
+    // for (auto i : childNode)i.second = DynArrow(60, sf::Color::Black, sf::Vector2f(position.x + CircleRad + 3, position.y), 0.f);
     m_text.setPosition(position);
 }
 
 void Node::setArrow(){
     for (int i = 0; i < childNode.size(); ++i)
     if (childNode[i].first != nullptr){
-        float length = dist2Node(getNodePosition(), childNode[i].first->getNodePosition());
+        float length = abs(dist2Node(getNodePosition(), childNode[i].first->getNodePosition()));
         rotateNextArrow(rad2Node(getNodePosition(), childNode[i].first->getNodePosition()), i);
-        childNode[i].second.minimizeArrow(childNode[i].second.getLength() - length);
+        // std::cout << "parent: " << getValue() << " child: " << childNode[i].first->getValue() << " dis: " << length << '\n';
+        childNode[i].second.minimizeArrow(length);
     }
 }
 
@@ -281,7 +292,7 @@ float Node::getLengthArrow(int id){
     return childNode[id].second.getLength();
 }
 
-sf::Vector2f Node::getNodePosition(){
+sf::Vector2f Node::getNodePosition() const {
     if (typeNode)return m_circle.getPosition();
     return m_rectangle.getPosition();
 }
@@ -306,8 +317,11 @@ void Node::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     {
         target.draw(text, states);
     }
-    for (auto i : childNode){
-        if (i.first)target.draw(*i.first, states);
+    for (auto i : childNode)if (i.first){
+        target.draw(*i.first, states);
+        if (std::min(abs(i.first->getNodePosition().x), abs(i.first->getNodePosition().y)) > 10 &&
+            std::min(abs(getNodePosition().x), abs(getNodePosition().y)) > 10)
+            target.draw(i.second, states);
     }
 }
        

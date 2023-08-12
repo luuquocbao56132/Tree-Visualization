@@ -34,6 +34,7 @@ public:
     void setPosition(sf::Vector2f );
     void changePosition(sf::Vector2f);
     void checkPosition();
+    void checkPositionFast();
     void setPosSpeed(sf::Vector2f, sf::Vector2f);
 
     void setPartialColor(float , int);
@@ -48,7 +49,7 @@ public:
 
     float getRad();
 
-    sf::Vector2f getNodePosition();
+    sf::Vector2f getNodePosition() const;
 
     std::string getString();
 
