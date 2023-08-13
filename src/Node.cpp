@@ -131,19 +131,6 @@ float Node::getRad(){
     return (typeNode == 1 ? m_circle.getRadius() : m_rectangle.getSize().x/2);
 }
 
-float dist2Node(sf::Vector2f x, sf::Vector2f y){
-    float height = x.y - y.y, width = x.x - y.x;
-    return sqrt(height*height + width*width) - CircleRad*2;
-}
-
-float rad2Node(sf::Vector2f x, sf::Vector2f y){
-    float height = y.y - x.y, width = y.x - x.x;
-    float angle = atan2(1,1 / (height / width)) * 180 / M_PI;
-    if (angle < 0)angle += 180;
-    if (height < 0)angle += 180; 
-    return angle;
-}
-
 void Node::changeSizeNode(float rad){
     float rate = (m_radius-rad) / m_radius;
     sf::Vector2f position = (typeNode == 1 ? m_circle.getPosition() : m_rectangle.getPosition());
@@ -174,23 +161,29 @@ void Node::setPosSpeed(sf::Vector2f x, sf::Vector2f y){
     positionSpeed = sf::Vector2f((y.x - x.x) / numFrame, (y.y - x.y) / numFrame);
 }
 
-void Node::checkPosition(){
+bool Node::checkPosition(){
+    bool kq = 0;
     sf::Vector2f speed = (m_position - getNodePosition()) * 0.05f;
     if (std::max(abs(m_position.x - getNodePosition().x), abs(m_position.y - getNodePosition().y)) > EPS)
-        setPosition(getNodePosition() + speed);
+        setPosition(getNodePosition() + speed), kq = 1;
 
     for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
-        childNode[i].first -> checkPosition();
+        kq |= childNode[i].first -> checkPosition();
+        childNode[i].second.m_home = m_position;
+        childNode[i].second.m_target = childNode[i].first -> m_position;
+        childNode[i].second.setPosition();
     }
-    setArrow();   
+    return kq;  
 }
 
 void Node::checkPositionFast(){
     setPosition(m_position);
     for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
         childNode[i].first -> checkPositionFast();
+        childNode[i].second.m_home = m_position;
+        childNode[i].second.m_target = childNode[i].first -> m_position;
+        childNode[i].second.setPosition();    
     }
-    setArrow();
 }
 
 void Node::changePosition(sf::Vector2f position){
@@ -209,15 +202,15 @@ void Node::setPosition(sf::Vector2f position){
     m_text.setPosition(position);
 }
 
-void Node::setArrow(){
-    for (int i = 0; i < childNode.size(); ++i)
-    if (childNode[i].first != nullptr){
-        float length = abs(dist2Node(getNodePosition(), childNode[i].first->getNodePosition()));
-        rotateNextArrow(rad2Node(getNodePosition(), childNode[i].first->getNodePosition()), i);
-        // std::cout << "parent: " << getValue() << " child: " << childNode[i].first->getValue() << " dis: " << length << '\n';
-        childNode[i].second.minimizeArrow(length);
-    }
-}
+// void Node::setArrow(){
+//     for (int i = 0; i < childNode.size(); ++i)
+//     if (childNode[i].first != nullptr){
+//         float length = abs(dist2Node(getNodePosition(), childNode[i].first->getNodePosition()));
+//         rotateNextArrow(rad2Node(getNodePosition(), childNode[i].first->getNodePosition()), i);
+//         // std::cout << "parent: " << getValue() << " child: " << childNode[i].first->getValue() << " dis: " << length << '\n';
+//         childNode[i].second.minimizeArrow(length);
+//     }
+// }
 
 void Node::changeText(Direction i, std::string text){
     m_text_directions[i].setString(text);
@@ -273,21 +266,6 @@ void Node::removeFound(float ratio){
     // gameGlobal->runBreak();
 }
 
-void Node::rotateNextArrow(float degrees, int id){
-    childNode[id].second.setRotation(degrees);
-    float dx = 0, dy = 0;
-    if (childNode[id].first != nullptr)
-        if (childNode[id].first->prevNode != nullptr){
-            dx = 6*std::sin(degrees * M_PI / 180);
-            dy = -6*std::cos(degrees * M_PI / 180);
-        } 
-    childNode[id].second.setPosition(sf::Vector2f(m_position.x + m_radius * std::cos(degrees * M_PI / 180.f) + dx, m_position.y + m_radius * std::sin(degrees * M_PI / 180.f) + dy));
-}
-
-void Node::changeSizeArrow(float length, int id){
-    childNode[id].second.minimizeArrow(length);
-}
-
 float Node::getLengthArrow(int id){
     return childNode[id].second.getLength();
 }
@@ -310,18 +288,18 @@ int Node::getHeight(){return H;}
     
 void Node::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     states.transform *= getTransform();
+
+    for (auto i : childNode)if (i.first){
+        if (std::min(abs(i.first->getNodePosition().x), abs(i.first->getNodePosition().y)) > 10 &&
+            std::min(abs(getNodePosition().x), abs(getNodePosition().y)) > 10)
+            target.draw(i.second, states);
+        target.draw(*i.first, states);
+    }
+
     if (typeNode)target.draw(m_circle, states);
         target.draw(m_rectangle, states);
     target.draw(m_text, states);
     for (const auto& text : m_text_directions)
-    {
         target.draw(text, states);
-    }
-    for (auto i : childNode)if (i.first){
-        target.draw(*i.first, states);
-        if (std::min(abs(i.first->getNodePosition().x), abs(i.first->getNodePosition().y)) > 10 &&
-            std::min(abs(getNodePosition().x), abs(getNodePosition().y)) > 10)
-            target.draw(i.second, states);
-    }
 }
        

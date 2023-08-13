@@ -4,9 +4,11 @@ void AVL::resetNode(std::shared_ptr <Node> res){
     if (res == nullptr)return;
     Node t = *res;
     *res = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, sf::Vector2f(0,0), CIRCLE, 2);
-    for (int i = 0; i < t.childNode.size(); ++i)
-        res->childNode[i].first = t.childNode[i].first,
-        res->childNode[i].second = DynArrow(60, sf::Color::Black, sf::Vector2f(res->getNodePosition().x + CircleRad + 3, res->getNodePosition().y), 0.f);
+    for (int i = 0; i < t.childNode.size(); ++i){
+        res->childNode[i].first = t.childNode[i].first;
+        if (res->childNode[i].first != nullptr)
+            res->childNode[i].second = DynArrow(res->getNodePosition(), res->childNode[i].first->getNodePosition());
+    }
     res->prevNode = t.prevNode;
     res->setHeight(t.getHeight());
     // x->changeSizeNode(x->getRad() - CircleRad);
@@ -36,9 +38,9 @@ void AVL::initGraph(int n){
     }
 }
 
-void checkPosition(std::shared_ptr <Node> n){
-    if (n == nullptr)return;
-    n->checkPosition();
+bool checkPosition(std::shared_ptr <Node> n){
+    if (n == nullptr)return 0;
+    return n->checkPosition();
 }
 
 void checkPositionFast(std::shared_ptr <Node> n){
@@ -48,7 +50,7 @@ void checkPositionFast(std::shared_ptr <Node> n){
 
 void AVL::checkFunction(){
     DataTypes::checkFunction();
-    checkPosition(graph.pHead);
+    if (checkPosition(graph.pHead))return;
     if (funcQueue.empty())return;
     // std::cout << funcQueue.size() << '\n';
     Animation ani = funcQueue.front();
@@ -65,6 +67,7 @@ void AVL::checkFunctionFast(){
     funcQueue.pop();
     ani.go();
     }
+    checkPositionFast(graph.pHead);
 }
 
 int AVL::getHeight(std::shared_ptr <Node> t){
@@ -95,14 +98,17 @@ void AVL::leftRotate(int k, int cas){
                 y->prevNode->childNode[i].first = y;
     x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
     y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
-    funcQueue.push(Animation({},{},{},{[&](){
-            balancePosition();
-        }}));
     for (int i = 0; i < y->childNode.size(); ++i)
         if (y->childNode[i].first == graph.pHead){
             graph.pHead = y;
             break;
         }
+    // funcQueue.push(Animation({},{},{},{[&](){
+    //         graph.pHead->setArrow();
+    //     }}));
+    funcQueue.push(Animation({},{},{},{[&](){
+            balancePosition();
+        }}));
     if (!cas)funcQueue.push(Animation({},{std::bind(&AVL::checkBalanceInt, this, y->getValue())},{},{}));
         else funcQueue.push(Animation({std::bind(&AVL::rightRotate, this, y->prevNode->getValue(), 0)},{},{},{}));
 }
@@ -125,14 +131,17 @@ void AVL::rightRotate(int k, int cas){
                 y->prevNode->childNode[i].first = y;
     x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
     y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
-    funcQueue.push(Animation({},{},{},{[&](){
-            balancePosition();
-        }}));
     for (int i = 0; i < y->childNode.size(); ++i)
         if (y->childNode[i].first == graph.pHead){
             graph.pHead = y;
             break;
         }
+    // funcQueue.push(Animation({},{},{},{[&](){
+    //         graph.pHead->setArrow();
+    //     }}));
+    funcQueue.push(Animation({},{},{},{[&](){
+            balancePosition();
+        }}));
     if (!cas)funcQueue.push(Animation({},{std::bind(&AVL::checkBalanceInt, this, y->getValue())},{},{}));
         else funcQueue.push(Animation({std::bind(&AVL::leftRotate, this, y->prevNode->getValue(), 0)},{},{},{}));
 }
@@ -241,7 +250,7 @@ void AVL::insert(int k){
                 else {
                     t = newNode(k, preNode);
                     preNode->childNode[idx].first = t;
-                    preNode->childNode[idx].second = DynArrow(60, sf::Color::Black, sf::Vector2f(preNode->getNodePosition().x + CircleRad + 3, preNode->getNodePosition().y), 0.f);
+                    preNode->childNode[idx].second = DynArrow(preNode->getNodePosition(), t->getNodePosition());
                 }
                 // std::cout << "newNode2: "<< t << " " << t->prevNode << " " << preNode << '\n';
             // auto insertNode = [this, k, &preNode, &t, &idx]() {
@@ -279,7 +288,7 @@ void AVL::insert(int k){
             for (int i = 1; i <= 60; ++i)
                 funcQueue.push(Animation({std::bind(&Node::removeSearching, t, i/60.f)},{},{},{}));
             preNode = t; t = t->childNode[1].first; idx = 1;
-        } else break;
+        } else funcQueue.push(Animation({},{},{},{}));
         // for (int i = 1; i <= 60; ++i)
         //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
     }

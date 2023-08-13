@@ -6,23 +6,20 @@
 class DynArrow: public sf::Drawable, public sf::Transformable{
 public:
     DynArrow ();
-    DynArrow(float, sf::Color , sf::Vector2f , float );
+    DynArrow(sf::Vector2f, sf::Vector2f );
     void setColor(const sf::Color& );
-    void setRotation(float );
-    void setPosition(sf::Vector2f);
     void setPartialColor(float );
-    void minimizeArrow(float );
+    void setLength();
+    void setAngle();
+    void setPosition();
     float getLength();
     float getAngle();
+    sf::Vector2f m_target,m_home;
     void draw(sf::RenderTarget& , sf::RenderStates ) const override;
 
 private:
     sf::RectangleShape m_body,m_particle;
-    sf::ConvexShape m_head;
-    float m_length;
-    sf::Color m_color;
-    sf::Vector2f m_position;
-    float m_angle;
+    float m_length, m_angle;
 };
 
 #endif // Arroww_hpp

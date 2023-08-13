@@ -33,8 +33,10 @@ public:
 
     void setPosition(sf::Vector2f );
     void changePosition(sf::Vector2f);
-    void checkPosition();
+    bool checkPosition();
     void checkPositionFast();
+    bool checkArrow();
+    void checkArrowFast();
     void setPosSpeed(sf::Vector2f, sf::Vector2f);
 
     void setPartialColor(float , int);
@@ -67,8 +69,6 @@ public:
 
     sf::Text m_text_directions[4];
     sf::Vector2f positionSpeed, m_position;
-    void updateCircle();
-    void setCircle(bool);
     int numArrow, H;
 private:
     bool typeNode;

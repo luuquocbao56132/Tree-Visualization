@@ -2,61 +2,48 @@
 
 DynArrow::DynArrow(){}
 
-DynArrow::DynArrow(float length, sf::Color color, sf::Vector2f position, float angle):
-    m_length(length),
-    m_color(color),
-    m_position(position),
-    m_angle(angle)
+DynArrow::DynArrow(sf::Vector2f Home, sf::Vector2f target):
+    m_home(Home),
+    m_target(target)
 {
-    m_body.setFillColor(color);
-    m_body.setSize(sf::Vector2f(length,3.f));
-
-    m_head.setPointCount(3);
-    m_head.setFillColor(color);
-    m_head.setPoint(0, sf::Vector2f(length, 1.5));
-    m_head.setPoint(1, sf::Vector2f(length-12, -4.5));
-    m_head.setPoint(2, sf::Vector2f(length-12, 7.5));
-    m_head.setOrigin(length-12.f, 1.5f);
+    m_length = ResourceManager::dist2Node(Home, target);
+    m_body.setFillColor(sf::Color::Black);
+    m_body.setSize(sf::Vector2f(m_length,3.f));
+    m_angle = ResourceManager::rad2Node(Home, target);
+    setAngle(); setPosition();
 
     m_particle.setFillColor(sf::Color::Yellow);
     m_particle.setSize(sf::Vector2f(0.f,3.f));
-    setPosition(position); 
+}
+
+void DynArrow::setAngle(){
+    m_body.setRotation(m_angle);
+    m_particle.setRotation(m_angle);
+}
+
+void DynArrow::setLength(){
+    float ratio_particle;
+    if (abs(m_length) < EPS)ratio_particle = 0; 
+        else ratio_particle = m_particle.getSize().x / m_length;
+    m_body.setSize(sf::Vector2f(m_length,3.f));
+    m_particle.setSize(sf::Vector2f(m_length*ratio_particle,3.f));
+}
+
+void DynArrow::setPosition(){
+    m_body.setPosition(m_home);
+    m_particle.setPosition(m_home);
+    m_length = ResourceManager::dist2Node(m_home, m_target);
+    m_angle = ResourceManager::rad2Node(m_home, m_target);
+    setAngle(); setLength();
 }
 
 void DynArrow::setColor(const sf::Color& color){
-    m_color = color;
     m_body.setFillColor(color);
-}
-
-void DynArrow::setRotation(float degrees){
-    m_body.setRotation(degrees);
-    m_head.setRotation(degrees);
-    m_particle.setRotation(degrees);
-    m_angle = degrees;
-}
-
-void DynArrow::setPosition(sf::Vector2f position){
-    m_body.setPosition(position);
-    m_particle.setPosition(position);
 }
 
 void DynArrow::setPartialColor(float ratio){
     float length = m_length * ratio;
     m_particle.setSize(sf::Vector2f(length, 3.f));
-}
-
-void DynArrow::minimizeArrow(float length){
-    // std::cout << "m_length: " << m_length << " length: " << length << '\n'; 
-    float ratio_particle;
-    if (abs(m_length) < EPS)ratio_particle = 0; 
-        else ratio_particle = m_particle.getSize().x / m_length;
-    m_length = length;
-    // m_length = std::max(m_length,1.f);
-    // std::cout << "mlength: " << m_length << '\n';
-
-    sf::Vector2f res = m_body.getPosition();
-    m_body.setSize(sf::Vector2f(m_length,3.f));
-    if (m_particle.getSize().x > 0)m_particle.setSize(sf::Vector2f(m_length * ratio_particle, 3.f));
 }
 
 float DynArrow::getLength(){
@@ -70,7 +57,7 @@ float DynArrow::getAngle(){
 void DynArrow::draw(sf::RenderTarget& target, sf::RenderStates states) const{
     states.transform *= getTransform();
     target.draw(m_body, states);
-    if (m_particle.getSize().y > 0)target.draw(m_particle, states);
+    if (m_particle.getSize().x > 0.f)target.draw(m_particle, states);
 }
 
 

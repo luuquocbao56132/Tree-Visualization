@@ -126,25 +126,6 @@ void Graph::resetStep(){
     stepIsListNew.clear(); stepListNew.clear();
 }
 
-void Graph::getStep(int dx){
-    if (stepNode.empty())return;
-    if (nowStep + dx >= stepNode.size() || nowStep + dx < 0)return;
-    nowStep += dx;
-    
-    listNode.resize(stepNode[nowStep].size()); 
-    n = listNode.size();
-    listNode = stepNode[nowStep];
-    newNode = stepNewNode[nowStep];
-    highlight.setLine(stepString[nowStep]); highlight.setHL(1);
-
-    for (int i = 0; i < listNode.size(); ++i){
-        listNode[i]->setArrow();
-    }
-
-    isListNew = stepIsListNew[nowStep];
-    listNew = stepListNew[nowStep];
-    // if (newNode)newNode->setArrow();
-}
 
 // void Graph::saveStep(){
 //     std::vector <std::shared_ptr <Node> > res;

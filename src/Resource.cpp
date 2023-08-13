@@ -26,6 +26,19 @@ int ResourceManager::StringtoInt(std::string s){
     return res;
 }
 
+float ResourceManager::dist2Node(sf::Vector2f x, sf::Vector2f y){
+    float height = x.y - y.y, width = x.x - y.x;
+    return sqrt(height*height + width*width);
+}
+
+float ResourceManager::rad2Node(sf::Vector2f x, sf::Vector2f y){
+    float height = y.y - x.y, width = y.x - x.x;
+    float angle = atan2(1,1 / (height / width)) * 180 / M_PI;
+    if (angle < 0)angle += 180;
+    if (height < 0)angle += 180; 
+    return angle;
+}
+
 sf::Color ResourceManager::changeColor(sf::Color startColor, sf::Color endColor, float ratio){
     float dr = ratio*(float)((int)endColor.r - (int)startColor.r);
     float dg = ratio*(float)((int)endColor.g - (int)startColor.g);
