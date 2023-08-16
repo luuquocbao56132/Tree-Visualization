@@ -163,15 +163,21 @@ void Node::setPosSpeed(sf::Vector2f x, sf::Vector2f y){
 
 bool Node::checkPosition(){
     bool kq = 0;
-    sf::Vector2f speed = (m_position - getNodePosition()) * 0.05f;
+    sf::Vector2f speed = (m_position - getNodePosition()) * 0.1f;
     if (std::max(abs(m_position.x - getNodePosition().x), abs(m_position.y - getNodePosition().y)) > EPS)
         setPosition(getNodePosition() + speed), kq = 1;
-
+    // std::cout << getValue() << " " << kq << " " << abs(m_position.x - getNodePosition().x) << " " << abs(m_position.y - getNodePosition().y) << '\n';
     for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
         kq |= childNode[i].first -> checkPosition();
-        childNode[i].second.m_home = m_position;
-        childNode[i].second.m_target = childNode[i].first -> m_position;
-        childNode[i].second.setPosition();
+    }
+    return kq;  
+}
+
+bool Node::checkArrow(){
+    bool kq = 0;
+    for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
+        kq |= childNode[i].second.checkPosition();
+        kq |= childNode[i].first -> checkArrow();
     }
     return kq;  
 }
@@ -180,9 +186,13 @@ void Node::checkPositionFast(){
     setPosition(m_position);
     for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
         childNode[i].first -> checkPositionFast();
-        childNode[i].second.m_home = m_position;
-        childNode[i].second.m_target = childNode[i].first -> m_position;
-        childNode[i].second.setPosition();    
+    }
+}
+
+void Node::checkArrowFast(){
+    for(int i = 0; i < childNode.size(); ++i) if (childNode[i].first != nullptr){
+        childNode[i].second.checkPositionFast();
+        childNode[i].first -> checkArrowFast();
     }
 }
 
@@ -201,16 +211,6 @@ void Node::setPosition(sf::Vector2f position){
     // for (auto i : childNode)i.second = DynArrow(60, sf::Color::Black, sf::Vector2f(position.x + CircleRad + 3, position.y), 0.f);
     m_text.setPosition(position);
 }
-
-// void Node::setArrow(){
-//     for (int i = 0; i < childNode.size(); ++i)
-//     if (childNode[i].first != nullptr){
-//         float length = abs(dist2Node(getNodePosition(), childNode[i].first->getNodePosition()));
-//         rotateNextArrow(rad2Node(getNodePosition(), childNode[i].first->getNodePosition()), i);
-//         // std::cout << "parent: " << getValue() << " child: " << childNode[i].first->getValue() << " dis: " << length << '\n';
-//         childNode[i].second.minimizeArrow(length);
-//     }
-// }
 
 void Node::changeText(Direction i, std::string text){
     m_text_directions[i].setString(text);
@@ -275,7 +275,7 @@ sf::Vector2f Node::getNodePosition() const {
     return m_rectangle.getPosition();
 }
 
-int Node::getValue(){
+int Node::getValue() const {
     return ResourceManager::StringtoInt(m_text.getString());
 }
 

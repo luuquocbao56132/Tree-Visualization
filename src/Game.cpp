@@ -50,7 +50,8 @@ void Game::processEvents(){
 
 void Game::update(sf::Time TimePerFrame){
     if (mWorld.liveData != nullptr){
-        mWorld.liveData->checkFunction();
+        if (caseSpeed)mWorld.liveData->checkFunction();
+            else mWorld.liveData->checkFunctionFast();
     }
 }
 

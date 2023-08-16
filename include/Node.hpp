@@ -55,7 +55,7 @@ public:
 
     std::string getString();
 
-    int getValue();
+    int getValue() const;
 
     void changeText(Direction, std::string );
 
@@ -70,7 +70,7 @@ public:
     sf::Text m_text_directions[4];
     sf::Vector2f positionSpeed, m_position;
     int numArrow, H;
-private:
+
     bool typeNode;
     sf::CircleShape m_circle;
     sf::RectangleShape m_rectangle;

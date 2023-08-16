@@ -12,9 +12,17 @@ public:
     void setLength();
     void setAngle();
     void setPosition();
+    void setHome(sf::Vector2f);
+    void setTail(sf::Vector2f);
+    void checkPositionFastHome();
+    bool checkPositionHome();
+    void checkPositionFastTail();
+    bool checkPositionTail();
+    void checkPositionFast();
+    bool checkPosition();
     float getLength();
     float getAngle();
-    sf::Vector2f m_target,m_home;
+    sf::Vector2f m_tail1, m_tail2, m_home1, m_home2;
     void draw(sf::RenderTarget& , sf::RenderStates ) const override;
 
 private:

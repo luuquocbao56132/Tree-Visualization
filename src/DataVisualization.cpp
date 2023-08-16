@@ -3,6 +3,7 @@
 
 float xtime = 1.f;
 float numFrame = 60.f;
+bool caseSpeed = 1;
 int typeTheme = ResourceManager::random(0,1);
 std::string theme = (typeTheme == 0 ? "" : "1");
 std::shared_ptr <Game> gameGlobal;

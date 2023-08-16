@@ -12,6 +12,7 @@ DataTypes::DataTypes():
         buttonState(-1),
         themeSet(){     
             MenuButton = Button(sf::Vector2f(10,10), sf::Vector2f(100,50), "Menu", ResourceManager::getFont(), 19, 0);
+            caseSpeedButton = Button(sf::Vector2f(120,10), sf::Vector2f(100,50), "Case Speed", ResourceManager::getFont(), 19, 0);
             upSpeed = Button(sf::Vector2f(980,10), sf::Vector2f(buttonSize.y/2,buttonSize.y/2), 
                             "U", ResourceManager::getFont(), 15, 0);
             downSpeed = Button(sf::Vector2f(980,10+buttonSize.y/2), sf::Vector2f(buttonSize.y/2,buttonSize.y/2), 
@@ -123,6 +124,7 @@ void DataTypes::draw(sf::RenderTarget& target, sf::RenderStates states) const{
     // if (!isTurn)return;
     target.draw(themeSet);
     target.draw(MenuButton);
+    target.draw(caseSpeedButton);
     target.draw(graphSquare);
     target.draw(timeText);
     target.draw(upSpeed); target.draw(downSpeed); 
@@ -137,6 +139,7 @@ void DataTypes::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 void DataTypes::checkHover(sf::Vector2f mousePos){
     themeSet.HoverCheck(mousePos);
     MenuButton.checkHover(mousePos);
+    caseSpeedButton.checkHover(mousePos);
     upSpeed.checkHover(mousePos);
     downSpeed.checkHover(mousePos);
     // previousButton.checkHover(mousePos);
@@ -149,6 +152,7 @@ void DataTypes::checkHover(sf::Vector2f mousePos){
 void DataTypes::checkPress(sf::Vector2f mousePos){
     //if (LL_button.checkPress(mousePos))isTurn = 1;
     if (MenuButton.checkPress(mousePos))gameGlobal->mWorld.liveData = nullptr;
+    if (caseSpeedButton.checkPress(mousePos))caseSpeed = !caseSpeed;
     for (int i = 0; i < BaseButton.size(); ++i)if (BaseButton[i]->checkPress(mousePos))
         buttonState = i, inputBox.clear(); 
     if (upSpeed.checkPress(mousePos))xtime = std::min(xtime + 1, 10.f), timeText.setString(std::to_string((int)xtime)+"x");

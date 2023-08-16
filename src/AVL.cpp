@@ -3,11 +3,11 @@
 void AVL::resetNode(std::shared_ptr <Node> res){
     if (res == nullptr)return;
     Node t = *res;
-    *res = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, sf::Vector2f(0,0), CIRCLE, 2);
+    *res = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, t.m_position, CIRCLE, 2);
     for (int i = 0; i < t.childNode.size(); ++i){
         res->childNode[i].first = t.childNode[i].first;
         if (res->childNode[i].first != nullptr)
-            res->childNode[i].second = DynArrow(res->getNodePosition(), res->childNode[i].first->getNodePosition());
+            res->childNode[i].second = DynArrow(res->m_position, res->childNode[i].first->m_position);
     }
     res->prevNode = t.prevNode;
     res->setHeight(t.getHeight());
@@ -18,7 +18,7 @@ void AVL::resetNode(std::shared_ptr <Node> res){
 }
 
 AVL::AVL(): DataTypes(), graph(){
-    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (99));
+    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (40));
     initGraph(ResourceManager::random(5, 12));
     clearQueue();
     resetNode(graph.pHead);
@@ -43,14 +43,29 @@ bool checkPosition(std::shared_ptr <Node> n){
     return n->checkPosition();
 }
 
+bool checkArrow(std::shared_ptr <Node> n){
+    if (n == nullptr)return 0;
+    return n->checkArrow();
+}
+
 void checkPositionFast(std::shared_ptr <Node> n){
     if (n == nullptr)return;
     n->checkPositionFast();
 }
 
+void checkArrowFast(std::shared_ptr <Node> n){
+    if (n == nullptr)return;
+    n->checkArrowFast();
+}
+
 void AVL::checkFunction(){
     DataTypes::checkFunction();
-    if (checkPosition(graph.pHead))return;
+    if (checkPosition(graph.pHead)){
+        checkArrow(graph.pHead); 
+        return;
+    } 
+    std::cout << 1234567 << '\n';
+    if (checkArrow(graph.pHead))return;
     if (funcQueue.empty())return;
     // std::cout << funcQueue.size() << '\n';
     Animation ani = funcQueue.front();
@@ -61,11 +76,11 @@ void AVL::checkFunction(){
 void AVL::checkFunctionFast(){
     DataTypes::checkFunctionFast();
     checkPositionFast(graph.pHead);
+    checkArrowFast(graph.pHead);
     while (!funcQueue.empty()){
-    // std::cout << funcQueue.size() << '\n';
-    Animation ani = funcQueue.front();
-    funcQueue.pop();
-    ani.go();
+        Animation ani = funcQueue.front();
+        funcQueue.pop();
+        ani.go();
     }
     checkPositionFast(graph.pHead);
 }
@@ -88,14 +103,25 @@ void AVL::leftRotate(int k, int cas){
     }
     std::shared_ptr <Node> y = x->childNode[1].first;
     std::shared_ptr <Node> T2 = y->childNode[0].first;
+
     y->childNode[0].first = x;
     x->childNode[1].first = T2;
-    if (T2 != nullptr)T2->prevNode = x; 
-    y->prevNode = x->prevNode; x->prevNode = y;
+    y->prevNode = x->prevNode; 
+    x->prevNode = y; 
+    if (T2 != nullptr){
+        T2->prevNode = x;
+        x->childNode[1].second.setTail(T2->m_position); 
+        y->childNode[0].second.setTail(x->m_position);
+    } else {
+        y->childNode[0].second = DynArrow(y->m_position, y->m_position);
+        y->childNode[0].second.setTail(x->m_position);
+    }
     if (y->prevNode != nullptr)
         for (int i = 0; i < y->prevNode->childNode.size(); ++i)
             if (y->prevNode->childNode[i].first == x)
-                y->prevNode->childNode[i].first = y;
+                y->prevNode->childNode[i].first = y,
+                y->prevNode->childNode[i].second.setTail(y->m_position);
+
     x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
     y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
     for (int i = 0; i < y->childNode.size(); ++i)
@@ -121,14 +147,25 @@ void AVL::rightRotate(int k, int cas){
     }
     std::shared_ptr <Node> y = x->childNode[0].first;
     std::shared_ptr <Node> T2 = y->childNode[1].first;
+
     y->childNode[1].first = x;
     x->childNode[0].first = T2;
-    if (T2 != nullptr)T2->prevNode = x;
-    y->prevNode = x->prevNode; x->prevNode = y;
+    y->prevNode = x->prevNode; 
+    x->prevNode = y; 
+    if (T2 != nullptr){
+        T2->prevNode = x;
+        x->childNode[0].second.setTail(T2->m_position);
+        y->childNode[1].second.setTail(x->m_position);
+    } else {
+        y->childNode[1].second = DynArrow(y->m_position, y->m_position);
+        y->childNode[1].second.setTail(x->m_position);
+    }
     if (y->prevNode != nullptr)
         for (int i = 0; i < y->prevNode->childNode.size(); ++i)
             if (y->prevNode->childNode[i].first == x)
-                y->prevNode->childNode[i].first = y;
+                y->prevNode->childNode[i].first = y,
+                y->prevNode->childNode[i].second.setTail(y->m_position);
+
     x->setHeight(1 + std::max(getHeight(x->childNode[0].first), getHeight(x->childNode[1].first)));
     y->setHeight(1 + std::max(getHeight(y->childNode[0].first), getHeight(y->childNode[1].first)));
     for (int i = 0; i < y->childNode.size(); ++i)
@@ -148,6 +185,7 @@ void AVL::rightRotate(int k, int cas){
 
 void AVL::checkBalance(std::shared_ptr <Node> t){
     if (t == nullptr)return;
+    std::cout << "balance: " << t->getValue() << '\n';
     int balance = getBalance(t);
     // std::cout << t << " " << t->getValue() << " " << balance << '\n';
     std::shared_ptr <Node> leftChild = t->childNode[0].first, rightChild = t->childNode[1].first;
@@ -180,6 +218,7 @@ void AVL::checkBalance(std::shared_ptr <Node> t){
 
 void AVL::checkBalanceInt(int gt){
     std::shared_ptr <Node> t = graph.pHead;
+    std::cout << "checkInt: " << gt << '\n';
     if (t == nullptr)return;    
     while (t->getValue() != gt){
         if (gt < t->getValue())t = t->childNode[0].first; else
@@ -208,22 +247,35 @@ void AVL::balancePosition(){
 
     listNode.clear();
     getList(graph.pHead); 
-    // std::cout << '\n';
     std::sort(listNode.begin(), listNode.end());
     for (int i = 0; i < listNode.size(); ++i){
         float k = listNode[i].second->m_position.y;
-        // std::cout << k << '\n';
         listNode[i].second->changePosition(sf::Vector2f(120 + 60*i, k));
-        // std::cout << listNode[i].second->m_position.x << " " << listNode[i].second->m_position.y << '\n';
+    }
+    for (int i = 0; i < listNode.size(); ++i){
+        std::shared_ptr <Node> x = listNode[i].second;
+        // std::cout << x->getValue() << '\n';
+        for (int j = 0; j < x->childNode.size(); ++j)
+            if (x->childNode[j].first != nullptr){
+                x->childNode[j].second.setTail(x->childNode[j].first->m_position);
+                x->childNode[j].second.setHome(x->m_position);
+                // std::cout << "pre pos: " << x->m_position.x << " " << x->m_position.y << 
+                //             "  x pos: " << x->childNode[j].first->m_position.x << " " << x->childNode[j].first->m_position.y << '\n';
+                // std::cout << "arrow pos" << x->childNode[j].second.m_home2.x << " " << x->childNode[j].second.m_home2.y << ' '
+                //             << x->childNode[j].second.m_tail2.x << " " << x->childNode[j].second.m_tail2.y << "\n \n";
+            }
     }
     listNode.clear();
 }
 
 std::shared_ptr <Node> AVL::newNode(int k, std::shared_ptr <Node> t){
     std::shared_ptr <Node> nod = std::make_shared <Node> (19.f, std::to_string(k), ResourceManager::getFont(), 
-                        textSize, backgroundColor,sf::Vector2f(0,0),CIRCLE,2);
+                        textSize, backgroundColor,(t == nullptr ? sf::Vector2f(0,0) : t->getNodePosition()),
+                        CIRCLE,2);
     nod->changeSizeNode(CircleRad);
-    // funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, nod->getRad()-CircleRad)},{},{},{}));
+    for (int i = 1; i <= 60; ++i)
+                funcQueue.push(Animation({std::bind(&Node::setSearching, nod, i/60.f)},{},{},{}));
+    funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, nod->getRad()-CircleRad)},{},{},{}));
     nod->prevNode = t;
     nod->setHeight(1);
     // std::cout << "newNode: " << nod->prevNode << " " << t << '\n';
@@ -252,28 +304,10 @@ void AVL::insert(int k){
                     preNode->childNode[idx].first = t;
                     preNode->childNode[idx].second = DynArrow(preNode->getNodePosition(), t->getNodePosition());
                 }
-                // std::cout << "newNode2: "<< t << " " << t->prevNode << " " << preNode << '\n';
-            // auto insertNode = [this, k, &preNode, &t, &idx]() {
-            //     if (graph.pHead == nullptr) {
-            //         graph.pHead = std::make_shared<Node>(newNode(k, preNode));
-            //     } else {
-            //         t = std::make_shared<Node>(newNode(k, preNode));
-            //         preNode->childNode[idx].first = t;
-            //     }
-            // };
-
-            funcQueue.push(Animation({},{},{},{[&](){
+            auto setPositionLambda = [t,this]() {
                 balancePosition();
-            }}));
-            // funcQueue.push(Animation({std::bind(&Node::setPosition, t, t->m_position)},{},{},{}));
-            auto setPositionLambda = [t]() {
-                t->setPosition(t->m_position);
             };
             funcQueue.push(Animation({},{},{},{setPositionLambda}));
-            // funcQueue.push(Animation({std::bind(&Node::setPosition, t, t->m_position)},{},{},{}));
-            for (int i = 1; i <= 60; ++i)
-                funcQueue.push(Animation({std::bind(&Node::changeSizeNode, t, -CircleRad/60.f),
-                                    std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
             break;
         }
         // std::cout << t->getValue() << '\n';
@@ -288,12 +322,16 @@ void AVL::insert(int k){
             for (int i = 1; i <= 60; ++i)
                 funcQueue.push(Animation({std::bind(&Node::removeSearching, t, i/60.f)},{},{},{}));
             preNode = t; t = t->childNode[1].first; idx = 1;
-        } else funcQueue.push(Animation({},{},{},{}));
+        } else break;
         // for (int i = 1; i <= 60; ++i)
         //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
     }
-
-    funcQueue.push(Animation({},{std::bind(&AVL::checkBalanceInt, this, t->getValue())},{},{}));
+    // std::cout << 123456 << '\n';
+    auto setPositionLambda = [t,this]() {
+        std::cout << 12345 << '\n';
+        checkBalance(t);
+    };
+    funcQueue.push(Animation({},{},{},{setPositionLambda}));
     // getHeightAll(graph.pHead);
     // balancePosition();
 }
