@@ -13,6 +13,7 @@ class World: public sf::Transformable, public sf::Drawable, private sf::NonCopya
 public:
     std::shared_ptr <DataTypes> liveData;
     Menu menu;
+    bool MenuState;
 
     World();
     void HoverCheck(sf::Vector2f);

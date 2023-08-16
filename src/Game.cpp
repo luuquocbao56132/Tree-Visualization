@@ -49,10 +49,10 @@ void Game::processEvents(){
 }
 
 void Game::update(sf::Time TimePerFrame){
-    if (mWorld.liveData != nullptr){
+    if (!mWorld.MenuState){
         if (caseSpeed)mWorld.liveData->checkFunction();
             else mWorld.liveData->checkFunctionFast();
-    }
+    } else mWorld.liveData = nullptr;
 }
 
 void Game::render(){

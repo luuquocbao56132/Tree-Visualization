@@ -17,6 +17,7 @@ public:
     void setText(const std::string& );
     void setTextBot(std::string );
     void setTextTop(std::string );
+    void setTextRight(std::string );
 
     void setArrow();
     void setNodeColor(sf::Color );

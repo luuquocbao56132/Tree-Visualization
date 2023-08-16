@@ -39,12 +39,12 @@ Node::Node(float radius, const std::string& text, const sf::Font& font, float te
     // east text
     m_text_directions[RIGHT].setString("");
     m_text_directions[RIGHT].setPosition(sf::Vector2f(position.x + radius + text_size, position.y));
+    setDirectionColor(sf::Color::Red,RIGHT);
     // south text
     m_text_directions[BOT].setString("");
-    m_text_directions[BOT].setStyle(sf::Text::Bold);
     m_text_directions[BOT].setOrigin(m_text_directions[BOT].getLocalBounds().width / 2.f, m_text_directions[BOT].getLocalBounds().height);
     m_text_directions[BOT].setPosition(sf::Vector2f(position.x, position.y + radius + text_size));
-    setDirectionColor(sf::Color(255, 0, 123),BOT);
+    setDirectionColor(sf::Color::Red,BOT);
     // west text
     m_text_directions[LEFT].setString("");
     m_text_directions[LEFT].setOrigin(m_text_directions[LEFT].getLocalBounds().width / 2.f, m_text_directions[LEFT].getLocalBounds().height);
@@ -231,6 +231,12 @@ void Node::setTextTop(std::string text){
     m_text_directions[TOP].setString(text);
     m_text_directions[TOP].setOrigin(m_text_directions[TOP].getLocalBounds().width / 2.f, m_text_directions[TOP].getLocalBounds().height);
     m_text_directions[TOP].setPosition(sf::Vector2f(m_position.x, m_position.y - m_radius - textSize));
+}
+
+void Node::setTextRight(std::string text){
+    m_text_directions[RIGHT].setString(text);
+    m_text_directions[RIGHT].setOrigin(m_text_directions[RIGHT].getLocalBounds().width / 2.f, m_text_directions[RIGHT].getLocalBounds().height);
+    m_text_directions[RIGHT].setPosition(sf::Vector2f(m_position.x + m_radius + textSize, m_position.y));
 }
 
 void Node::setDirectionColor(const sf::Color& color, unsigned int direction){

@@ -21,9 +21,9 @@ void DynArrow::setAngle(){
 }
 
 void DynArrow::setLength(){
-    float ratio_particle;
-    if (abs(m_length) < EPS)ratio_particle = 0; 
-        else ratio_particle = m_particle.getSize().x / m_length;
+    float ratio_particle = 0;
+    if (abs(m_body.getSize().x) < EPS)ratio_particle = 0; 
+        else ratio_particle = m_particle.getSize().x / m_body.getSize().x;
     m_body.setSize(sf::Vector2f(m_length,3.f));
     m_particle.setSize(sf::Vector2f(m_length*ratio_particle,3.f));
 }
@@ -84,6 +84,7 @@ void DynArrow::setColor(const sf::Color& color){
 
 void DynArrow::setPartialColor(float ratio){
     float length = m_length * ratio;
+    // std::cout << length << '\n';
     m_particle.setSize(sf::Vector2f(length, 3.f));
 }
 

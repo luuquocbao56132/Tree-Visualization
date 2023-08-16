@@ -1,6 +1,6 @@
 #include <World.hpp>
 
-World::World(): menu(){   
+World::World(): menu(), MenuState(1){   
     // set the button size and character size
     sf::Vector2f buttonSize(120.f, 65.f);
     unsigned int characterSize = 30;
@@ -26,9 +26,11 @@ void World::checkPress(sf::Vector2f mousePos){
     int t = menu.checkPress(mousePos);
     switch (t) {
         case 1:
+            MenuState = 0;
             liveData = std::make_shared <HashTable> ();
             break;
         case 2:
+            MenuState = 0;
             liveData = std::make_shared <AVL> ();
             break;
     }
