@@ -491,7 +491,9 @@ void AVL::remove(int k){
                             funcQueue.push(Animation({std::bind(&Node::setSearching, rightMin, i/60.f)},{},{},{})); 
                     }
                     startCheckNode = rightMin->prevNode;
-                } else startCheckNode = t->prevNode;
+                } else {
+                    startCheckNode = t->prevNode;
+                }
                 //xoa node t
                 for (int i = 1; i <= 60; ++i)
                     funcQueue.push(Animation({std::bind(&Node::changeSizeNode, t, CircleRad/60.f)},{},{},{}));
@@ -556,6 +558,7 @@ void AVL::remove(int k){
                                 }
                                 rightMin->childNode[i].first = t->childNode[i].first;
                             }
+                        if (graph.pHead == t) graph.pHead = rightMin;
                             
                     } else {
                         for (int i = 0; i < t->childNode.size(); ++i)
@@ -572,6 +575,8 @@ void AVL::remove(int k){
                                     else t->prevNode->childNode[i].second.setTail(t->prevNode->m_position);
                                     break;
                         }
+
+                        if (graph.pHead == t) graph.pHead = t->childNode[0].first;
 
                         auto setPositionLambda = [t,this]() {
                             balancePosition();
