@@ -144,6 +144,7 @@ void AVL::leftRotate(int k, int cas){
 
 void AVL::rightRotate(int k, int cas){
     std::shared_ptr <Node> x = graph.pHead;
+    // std::cout << "value: " << k << '\n';
     while (x->getValue() != k){
         if (k < x->getValue())x = x->childNode[0].first; else
         if (k > x->getValue())x = x->childNode[1].first;
@@ -188,7 +189,7 @@ void AVL::rightRotate(int k, int cas){
 
 void AVL::checkBalance(std::shared_ptr <Node> t){
     if (t == nullptr)return;
-    std::cout << "balance: " << t->getValue() << '\n';
+    // std::cout << "balance: " << t->getValue() << '\n';
     int balance = getBalance(t);
     // std::cout << t << " " << t->getValue() << " " << balance << '\n';
     std::shared_ptr <Node> leftChild = t->childNode[0].first, rightChild = t->childNode[1].first;
@@ -200,53 +201,57 @@ void AVL::checkBalance(std::shared_ptr <Node> t){
     //             << " right: " << (rightChild == nullptr ? 0 : rightChild->getValue()) << '\n';
     // std::cout << "leftHeight: " << (leftChild == nullptr ? 0 : getHeight(leftChild)) 
     //             << " rightHeight: " << (rightChild == nullptr ? 0 : getHeight(rightChild)) << '\n';
-    
-    if (balance > 1 && getBalance(leftChild) > 0){
-        auto setFunctionLambda = [t,this]() {
-            rightRotate(t->getValue(), 0);
-        };
-        funcQueue.push(Animation({},{},{},{setFunctionLambda}));
-        return;
-    } else if (balance < -1 && getBalance(rightChild) < 0){
-        auto setFunctionLambda = [t,this]() {
-            leftRotate(t->getValue(), 0);
-        };
-        funcQueue.push(Animation({},{},{},{setFunctionLambda}));
-        return;
-    } else if (balance > 1 && getBalance(leftChild) < 0){
-        auto setFunctionLambda = [leftChild,this]() {
-            leftRotate(leftChild->getValue(), 1);
-        };
-        funcQueue.push(Animation({},{},{},{setFunctionLambda}));
-        return; 
-    } else if (balance < -1 && getBalance(rightChild) > 0){
-        auto setFunctionLambda = [rightChild,this]() {
-            rightRotate(rightChild->getValue(), 1); 
-        };
-        funcQueue.push(Animation({},{},{},{setFunctionLambda}));
-        return;
-    } else {
-        auto setFunctionLambda = [t,this]() {
-            t->setHeight(1 + std::max(getHeight(t->childNode[0].first), getHeight(t->childNode[1].first)));
-            // std::cout << "t: " << (t == nullptr ? 0 : t->getValue()) << '\n';
-            for (int i = 0; i < t->childNode.size(); ++i)
-                if (t->childNode[i].first == graph.pHead){
-                    graph.pHead = t;
-                    break;
-                }
-            for (int i = 1; i <= 60; ++i)
-                    funcQueue.push(Animation({std::bind(&Node::removeSearching, t, i/60.f),
-                                            std::bind(&Node::setTextBot, t, "")},
-                                            {},{},{}));
-            if (t->prevNode != nullptr)funcQueue.push(Animation({},{std::bind(&AVL::checkBalanceInt, this, t->prevNode->getValue())},{},{}));
-        };
-        funcQueue.push(Animation({},{},{},{setFunctionLambda}));
-    }
+    auto bigFunc = [balance, this, leftChild, rightChild,t](){
+                    std::cout << "balance: " << t->getValue() << " " << balance << "\n   " 
+                            << (leftChild != nullptr ? leftChild->getValue() : 0) << " " << getBalance(leftChild) << "\n   " 
+                            << (rightChild != nullptr ? rightChild->getValue() : 0) << " " << getBalance(rightChild) << '\n';
+        if (balance > 1 && getBalance(leftChild) >= 0){
+            auto setFunctionLambda = [t,this]() {
+                rightRotate(t->getValue(), 0);
+            };
+            funcQueue.push(Animation({},{},{},{setFunctionLambda}));
+            return;
+        } else if (balance < -1 && getBalance(rightChild) <= 0){
+            auto setFunctionLambda = [t,this]() {
+                leftRotate(t->getValue(), 0);
+            };
+            funcQueue.push(Animation({},{},{},{setFunctionLambda}));
+            return;
+        } else if (balance > 1 && getBalance(leftChild) < 0){
+            auto setFunctionLambda = [leftChild,this]() {
+                leftRotate(leftChild->getValue(), 1);
+            };
+            funcQueue.push(Animation({},{},{},{setFunctionLambda}));
+            return; 
+        } else if (balance < -1 && getBalance(rightChild) > 0){
+            auto setFunctionLambda = [rightChild,this]() {
+                rightRotate(rightChild->getValue(), 1); 
+            };
+            funcQueue.push(Animation({},{},{},{setFunctionLambda}));
+            return;
+        } else {
+            auto setFunctionLambda = [t,this]() {
+                t->setHeight(1 + std::max(getHeight(t->childNode[0].first), getHeight(t->childNode[1].first)));
+                // std::cout << "t: " << (t == nullptr ? 0 : t->getValue()) << '\n';
+                for (int i = 0; i < t->childNode.size(); ++i)
+                    if (t->childNode[i].first == graph.pHead){
+                        graph.pHead = t;
+                        break;
+                    }
+                for (int i = 1; i <= 60; ++i)
+                        funcQueue.push(Animation({std::bind(&Node::removeSearching, t, i/60.f),
+                                                std::bind(&Node::setTextBot, t, "")},
+                                                {},{},{}));
+                if (t->prevNode != nullptr)funcQueue.push(Animation({},{std::bind(&AVL::checkBalanceInt, this, t->prevNode->getValue())},{},{}));
+            };
+            funcQueue.push(Animation({},{},{},{setFunctionLambda}));
+        }
+    };
+    funcQueue.push(Animation({},{},{},{bigFunc}));
 }
 
 void AVL::checkBalanceInt(int gt){
     std::shared_ptr <Node> t = graph.pHead;
-    std::cout << "checkInt: " << gt << '\n';
     if (t == nullptr)return;    
     while (t->getValue() != gt){
         if (gt < t->getValue())t = t->childNode[0].first; else
@@ -364,7 +369,6 @@ void AVL::insert(int k){
     }
     // std::cout << 123456 << '\n';
     auto setPositionLambda = [t,this]() {
-        std::cout << 12345 << '\n';
         checkBalance(t);
     };
     funcQueue.push(Animation({},{},{},{setPositionLambda}));
@@ -464,14 +468,15 @@ void AVL::remove(int k){
         } else {
             int rr = ResourceManager::StringtoInt(t->m_text_directions[RIGHT].getString());
             if (rr){
-                if (rr == 1)
+                if (rr == 2)
                     funcQueue.push(Animation({std::bind(&Node::setTextRight, t, "")},
                                     {},{},{})); 
                 else
                     funcQueue.push(Animation({std::bind(&Node::setTextRight, t, std::to_string(rr-1))},
                                     {},{},{})); 
             } else {
-                std::shared_ptr <Node> rightMin = t->childNode[1].first;
+                std::shared_ptr <Node> rightMin = t->childNode[1].first, startCheckNode;
+                //tim rightMin
                 if (rightMin != nullptr){
                     for (int i = 1; i <= 60; ++i)
                         funcQueue.push(Animation({std::bind(&DynArrow::setPartialColor, t->childNode[1].second, i/60.f)},{},{},{}));                    
@@ -485,23 +490,56 @@ void AVL::remove(int k){
                         for (int i = 1; i <= 60; ++i)
                             funcQueue.push(Animation({std::bind(&Node::setSearching, rightMin, i/60.f)},{},{},{})); 
                     }
-                }
-
+                    startCheckNode = rightMin->prevNode;
+                } else startCheckNode = t->prevNode;
+                //xoa node t
                 for (int i = 1; i <= 60; ++i)
                     funcQueue.push(Animation({std::bind(&Node::changeSizeNode, t, CircleRad/60.f)},{},{},{}));
-                auto setFunction = [t,rightMin]{
+                //noi cac arrow
+                auto setFunction = [t,rightMin,startCheckNode, this]{
                     for (int i = 0; i < t->childNode.size(); ++i)
                         if (t->childNode[i].first != nullptr){
                             t->childNode[i].second.setTail(t->m_position);
                         }
                     if (rightMin != nullptr){
+                        if (rightMin->prevNode != t){ // connect parent cua node moi voi node con cua node moi
+                            for (int i = 0; i < rightMin->prevNode->childNode.size(); ++i)
+                                if (rightMin->prevNode->childNode[i].first == rightMin){
+                                    rightMin->prevNode->childNode[i].first = rightMin->childNode[1].first;
+                                    if (rightMin->childNode[1].first != nullptr)
+                                        rightMin->prevNode->childNode[i].second.setTail(rightMin->childNode[1].first->m_position),
+                                        rightMin->childNode[1].first->prevNode = rightMin->prevNode;
+                                    else rightMin->prevNode->childNode[i].second.setTail(rightMin->prevNode->m_position);
+                                    break;
+                                }
+                            auto setPositionLambda = [startCheckNode,this]() {
+                                balancePosition();
+                            };
+                            funcQueue.push(Animation({},{},{},{setPositionLambda}));
+                            auto setPosition2Lambda = [startCheckNode,this]() {
+                                checkBalance(startCheckNode);
+                            };
+                            funcQueue.push(Animation({},{},{},{setPosition2Lambda}));
+                        } else {
+                            auto setPositionLambda = [rightMin,this]() {
+                                balancePosition();
+                            };
+                            funcQueue.push(Animation({},{},{},{setPositionLambda}));
+                            auto setPosition2Lambda = [rightMin,this]() {
+                                checkBalance(rightMin);
+                            };
+                            funcQueue.push(Animation({},{},{},{setPosition2Lambda}));
+                        }
+
                         if (t->prevNode != nullptr) // connect parent cua t voi node moi
-                                for (int i = 0; i < t->prevNode->childNode.size(); ++i)
-                                    if (t->prevNode->childNode[i].first == t){
-                                        t->prevNode->childNode[i].first = rightMin;
-                                        t->prevNode->childNode[i].second.setTail(rightMin->m_position);
-                                        break;
-                                    }
+                            for (int i = 0; i < t->prevNode->childNode.size(); ++i)
+                                if (t->prevNode->childNode[i].first == t){
+                                    t->prevNode->childNode[i].first = rightMin;
+                                    t->prevNode->childNode[i].second.setTail(rightMin->m_position);
+                                    break;
+                        }
+                        rightMin->prevNode = t->prevNode;
+                        
                         //connect node con cua t thanh node con cua node moi
                         for (int i = 0; i < t->childNode.size(); ++i)if (t->childNode[i].first != rightMin){
                                 if (t->childNode[i].first != nullptr){
@@ -511,46 +549,48 @@ void AVL::remove(int k){
                                         rightMin->childNode[i].second = DynArrow(rightMin->m_position, rightMin->m_position);
                                         rightMin->childNode[i].second.setTail(t->childNode[i].first->m_position);
                                     }
+                                    t->childNode[i].first->prevNode = rightMin;
                                 } else {
                                     if (rightMin->childNode[i].first != nullptr)
                                         rightMin->childNode[i].second.setTail(rightMin->m_position);
                                 }
                                 rightMin->childNode[i].first = t->childNode[i].first;
                             }
-                        if (rightMin->prevNode != t){
-                            // connect parent cua node moi voi node con cua node moi
-                            for (int i = 0; i < rightMin->prevNode->childNode.size(); ++i)
-                                if (rightMin->prevNode->childNode[i].first == rightMin){
-                                    rightMin->prevNode->childNode[i].first = rightMin->childNode[1].first;
-                                    if (rightMin->childNode[1].first != nullptr)
-                                        rightMin->prevNode->childNode[i].second.setTail(rightMin->childNode[1].first->m_position);
-                                    break;
-                                }
-                        }
+                            
                     } else {
-                        if (t->prevNode != nullptr);
-                        for (int i = 0; i < t->prevNode->childNode.size(); ++i)
-                        if (t->prevNode->childNode[i].first == t){
-                            t->prevNode->childNode[i].first = t->childNode[0].first;
-                            if (t->childNode[0].first != nullptr)
-                                t->prevNode->childNode[i].second.setTail(t->childNode[0].first->m_position);
-                            else t->prevNode->childNode[i].second.setTail(t->prevNode->m_position);
-                            break;
+                        for (int i = 0; i < t->childNode.size(); ++i)
+                            if (t->childNode[i].first != nullptr){
+                                t->childNode[i].first->prevNode = t->prevNode;
+                            }
+
+                        if (t->prevNode != nullptr)
+                            for (int i = 0; i < t->prevNode->childNode.size(); ++i)
+                                if (t->prevNode->childNode[i].first == t){
+                                    t->prevNode->childNode[i].first = t->childNode[0].first;
+                                    if (t->childNode[0].first != nullptr)
+                                        t->prevNode->childNode[i].second.setTail(t->childNode[0].first->m_position);
+                                    else t->prevNode->childNode[i].second.setTail(t->prevNode->m_position);
+                                    break;
                         }
+
+                        auto setPositionLambda = [t,this]() {
+                            balancePosition();
+                        };
+                        funcQueue.push(Animation({},{},{},{setPositionLambda}));
+                        auto setPosition2Lambda = [t,this]() {
+                            checkBalance(t->prevNode);
+                        };
+                        funcQueue.push(Animation({},{},{},{setPosition2Lambda}));
                     }
                 };
                 funcQueue.push(Animation({},{},{},{setFunction}));
-                break;
             }
+            break;
         }
         // for (int i = 1; i <= 60; ++i)
         //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
     }
     // std::cout << 123456 << '\n';
-    auto setPositionLambda = [t,this]() {
-        checkBalance(t);
-    };
-    funcQueue.push(Animation({},{},{},{setPositionLambda}));
 }
 
 void AVL::draw(sf::RenderTarget& target, sf::RenderStates states) const{
