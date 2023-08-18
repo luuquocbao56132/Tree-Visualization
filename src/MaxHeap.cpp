@@ -316,6 +316,7 @@ void MaxHeap::fromfile(){
     }
     clearQueue();
     resetNode();
+    balancePosition();
     checkFunctionFast();
 }
 
