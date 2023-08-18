@@ -78,6 +78,7 @@ static float nodeRadius = 19;
 static float TimePerFrame = 1/60;
 extern std::string theme;
 extern int typeTheme;
+extern int lg2[200];
 extern bool isThemeChange;
 extern float numFrame;
 extern float xtime;

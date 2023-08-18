@@ -33,6 +33,10 @@ void World::checkPress(sf::Vector2f mousePos){
             MenuState = 0;
             liveData = std::make_shared <AVL> ();
             break;
+        case 6:
+            MenuState = 0;
+            liveData = std::make_shared <MaxHeap> ();
+            break;
     }
     }
     if (liveData)std::cout << "liveData\n";
