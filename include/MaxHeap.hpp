@@ -12,13 +12,11 @@ public:
     void initGraph(int);
     std::shared_ptr <Node> newNode(int);
     void resetNode();
-    void getList(std::shared_ptr <Node>);
     void balancePosition();
-    void setVerticalPosition(std::shared_ptr <Node>, int);
     void draw(sf::RenderTarget& , sf::RenderStates ) const override;
     void insert(int);
     void remove(int);
-    void search(int);
+    void getTop();
     void runUp(int);
     void runDown(int);
     void checkFunction() override;

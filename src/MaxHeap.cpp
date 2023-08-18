@@ -25,6 +25,7 @@ void MaxHeap::resetNode(){
 
 MaxHeap::MaxHeap(): DataTypes(), numValue(0){
     BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (63));
+    BaseButton.back()->inputButton.clear();
     initGraph(ResourceManager::random(5, 50));
     clearQueue();
     resetNode();
@@ -289,33 +290,11 @@ void MaxHeap::fromfile(){
     checkFunctionFast();
 }
 
-void MaxHeap::search(int k){
-    // clearQueue(); resetNode(graph.pHead); balancePosition(); checkFunctionFast(); 
-    // std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
-    // std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
-    // int idx = 0;
-    // while (true){
-    //     // std::cout << "out " << t << " ";
-    //     // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
-    //     if (t == nullptr){
-    //         break;
-    //     }
-    //     // std::cout << t->getValue() << '\n';
-    //     for (int i = 1; i <= 60; ++i)
-    //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
-    //     if (k < t->getValue()){
-    //         preNode = t; t = t->childNode[0].first; idx = 0;
-    //         for (int i = 1; i <= 60; ++i)
-    //             funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
-    //                                         std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
-    //     } else 
-    //     if (k > t->getValue()){
-    //         preNode = t; t = t->childNode[1].first; idx = 1;
-    //         for (int i = 1; i <= 60; ++i)
-    //             funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
-    //                                         std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
-    //     } else break;
-    // }
+void MaxHeap::getTop(){
+    clearQueue(); resetNode(); balancePosition(); checkFunctionFast(); 
+    if (numValue == 0)return;
+    for (int i = 1; i <= 60; ++i)
+        funcQueue.push(Animation({std::bind(&Node::setSearching, listNode[1], i/60.f)},{},{},{}));
 }
 
 void MaxHeap::remove(int k){
@@ -531,14 +510,7 @@ void MaxHeap::checkPress(sf::Vector2f mousePos){
                 }
                 break;
             case SEARCH:
-                if (res->checkPress(mousePos)){
-                    inputBox = res->inputButton; 
-                    for (auto i : inputBox)i->resetValue();
-                }
-                if (!inputBox.empty() && inputBox[0] == res->inputButton[0]){
-                    inputBox[0]->checkPress(mousePos);
-                    if (inputBox[0]->Go->checkPress(mousePos))search(inputBox[0]->getValue());
-                }
+                getTop();
                 break;
         }
     }
