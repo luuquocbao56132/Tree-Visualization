@@ -20,7 +20,9 @@ public:
     void remove(int);
     void search(int);
     void fromfile();
+    void resetNode();
     void checkFunction() override;
+    void checkFunctionFast() override;
     // void getFromFile();
     void checkPress(sf::Vector2f ) override;
 

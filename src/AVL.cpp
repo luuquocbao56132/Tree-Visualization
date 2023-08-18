@@ -21,8 +21,8 @@ void AVL::resetNode(std::shared_ptr <Node> res){
 }
 
 AVL::AVL(): DataTypes(), graph(){
-    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (60));
-    initGraph(ResourceManager::random(5, 12));
+    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (70));
+    initGraph(ResourceManager::random(5, 50));
     clearQueue();
     resetNode(graph.pHead);
     balancePosition();

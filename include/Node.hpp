@@ -54,7 +54,7 @@ public:
 
     sf::Vector2f getNodePosition() const;
 
-    std::string getString();
+    std::string getString() const;
 
     int getValue() const;
 

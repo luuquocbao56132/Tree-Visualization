@@ -3,7 +3,18 @@
 
 extern std::shared_ptr <Game> gameGlobal;
 
+void HashTable::resetNode(){
+    for (int i = 0; i < graph.getSize(); ++i){
+        Node t = *graph.listNode[i];
+        graph.listNode[i] = std::make_shared <Node> (19.f, t.getString(), ResourceManager::getFont(), 
+                                    textSize, backgroundColor,t.getNodePosition(),ARRAY,0);
+        // graph.listNode[i]->setPosition();
+        graph.listNode[i]->setTextBot(std::to_string(i));
+    }
+}
+
 HashTable::HashTable(): DataTypes(), graph(){
+    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (72));
     firstGraph = graph;
 }
 
@@ -72,6 +83,16 @@ void HashTable::checkFunction(){
     ani.go();
 }
 
+void HashTable::checkFunctionFast(){
+    DataTypes::checkFunctionFast();
+    while (!funcQueue.empty()){
+    // std::cout << funcQueue.size() << '\n';
+        Animation ani = funcQueue.front();
+        funcQueue.pop();
+        ani.go();
+    }
+}
+
 void HashTable::fromfile(){
     std::ifstream file("customInput.txt"); // open the file
     std::string line;
@@ -102,11 +123,10 @@ void HashTable::fromfile(){
 }
 
 void HashTable::insert(int x){
-    graph = firstGraph;
+    clearQueue(); resetNode();
     if (graph.getNumValue() == graph.getSize()-1){
         return;
     }
-    clearQueue(); 
     
     int j = x % graph.getSize();
     for (int i = 1; i <= 60; ++i)
@@ -124,12 +144,14 @@ void HashTable::insert(int x){
             funcQueue.push(Animation({std::bind(&Array::setFoundNode, &graph, j, i/60.f)}, {},
                                     {std::bind(&Node::setText, graph.listNode[j], std::to_string(x))},{}));
     funcQueue.push(Animation({}, {}, {}, {[&](){
-        ++graph.numValue; firstGraph = graph;
+        ++graph.numValue;
     }}));
+    // for (int i = 0; i < graph.getSize(); ++i)std::cout << graph.listNode[i]->getString() << ' '; std::cout << '\n';
+    // for (int i = 0; i < firstGraph.getSize(); ++i)std::cout << firstGraph.listNode[i]->getString() << ' '; std::cout << '\n';
 }
 
 void HashTable::remove(int x){
-    graph = firstGraph; clearQueue(); 
+    clearQueue(); resetNode(); 
 
     int j = x % graph.getSize();
     for (int i = 1; i <= 60; ++i)
@@ -152,12 +174,11 @@ void HashTable::remove(int x){
 
     funcQueue.push(Animation({}, {}, {}, {std::bind(&Node::setText, graph.listNode[j], ""), [&](){
         --graph.numValue; 
-        firstGraph = graph;
     }}));
 }
 
 void HashTable::search(int x){
-    graph = firstGraph; clearQueue();
+    clearQueue(); resetNode();
 
     int j = x % graph.getSize();
     for (int i = 1; i <= 60; ++i)

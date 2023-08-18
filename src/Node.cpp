@@ -285,7 +285,7 @@ int Node::getValue() const {
     return ResourceManager::StringtoInt(m_text.getString());
 }
 
-std::string Node::getString(){
+std::string Node::getString() const {
     return m_text.getString();
 }
 
@@ -305,6 +305,7 @@ void Node::draw(sf::RenderTarget& target, sf::RenderStates states) const {
     if (typeNode)target.draw(m_circle, states);
         target.draw(m_rectangle, states);
     target.draw(m_text, states);
+    // std::cout << m_text.getString().toAnsiString() << '\n';
     for (const auto& text : m_text_directions)
         target.draw(text, states);
 }
