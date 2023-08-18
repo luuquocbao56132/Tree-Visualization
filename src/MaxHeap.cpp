@@ -111,6 +111,7 @@ void MaxHeap::balancePosition(){
         std::shared_ptr <Node> x = listNode[i];
         // std::cout << x->getValue() << '\n';
         x->changePosition(getPosI(i));
+        x->setTextBot(std::to_string(i));
     }
 }
 
@@ -126,17 +127,39 @@ std::shared_ptr <Node> MaxHeap::newNode(int k){
     return nod;
 }
 
-void MaxHeap::runUp(int idx){
+void MaxHeap::runUp(int idx, int cas){
     std::shared_ptr <Node> t = listNode[idx];
     std::shared_ptr <Node> preNode = listNode[idx/2];
 
     if (idx == 1 || t->getValue() <= preNode->getValue()){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Node::removeSearching, listNode[idx], i/60.f)},{},{},{}));
+        if (cas){
+            for (int i = 1; i <= 60; ++i){
+                auto funcDel = [this, i]{
+                    listNode[1]->changeSizeNode(CircleRad/60.f);
+                };
+                funcQueue.push(Animation({},{},{},{funcDel}));
+            }
+
+            auto funcDel = [this]{
+                if (numValue & 1)listArrow[numValue / 2].second.setTail(getPosI(numValue/2));
+                        else listArrow[numValue / 2].first.setTail(getPosI(numValue/2));
+                --numValue; listNode[1] = listNode[numValue+1]; listNode[numValue+1] = nullptr;
+                balancePosition();
+            };
+            funcQueue.push(Animation({},{},{},{funcDel}));
+
+            auto funcc = [this]{
+                for (int i = 1; i <= 60; ++i)
+                    funcQueue.push(Animation({std::bind(&Node::setSearching, listNode[1], i/60.f)},{},{},{}));
+                runDown(1);
+            };
+            funcQueue.push(Animation({},{},{},{funcc}));
+        }
         return;
     }
 
-    
     funcQueue.push(Animation({std::bind(&Node::setSearching, preNode, 1.f)},{},{},{}));
     for (int i = 1; i <= 60; ++i){
         auto funcLambda = [this, preNode, idx, i](){
@@ -164,8 +187,8 @@ void MaxHeap::runUp(int idx){
         funcQueue.push(Animation({},{},{},{funcLambda2}));
     }
 
-    auto funcLambda2 = [this, idx]{
-        runUp(idx/2);
+    auto funcLambda2 = [this, idx, cas]{
+        runUp(idx/2,cas);
     };
     funcQueue.push(Animation({},{},{},{funcLambda2}));
 }
@@ -183,6 +206,12 @@ void MaxHeap::runDown(int idx){
     if (preNode == nullptr || t->getValue() >= preNode->getValue()){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Node::removeSearching, listNode[idx], i/60.f)},{},{},{}));
+        auto funcLambda2 = [idx,this]{
+            listNode[idx]->setNodeColor(FirstNodeColor);
+            listNode[idx]->setOutlineColor(sf::Color::Black);
+            listNode[idx]->setTextColor(textColorStart);
+        };
+        funcQueue.push(Animation({},{},{},{funcLambda2}));
         return;
     }
 
@@ -243,7 +272,7 @@ void MaxHeap::insert(int k){
     //     funcQueue.push(Animation({std::bind(&Node::setSearching, listNode[t], i/60.f)},{},{},{}));
 
     auto funcLambda = [this](){
-        runUp(numValue);
+        runUp(numValue,0);
     };
     funcQueue.push(Animation({},{},{},{funcLambda}));
 }
@@ -297,160 +326,18 @@ void MaxHeap::getTop(){
         funcQueue.push(Animation({std::bind(&Node::setSearching, listNode[1], i/60.f)},{},{},{}));
 }
 
-void MaxHeap::remove(int k){
-    // clearQueue(); resetNode(graph.pHead); balancePosition(); checkFunctionFast(); 
-    // std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
-    // std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
-    // int idx = 0;
-    // while (true){
-    //     // std::cout << "out " << t << " ";
-    //     // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
-    //     if (t == nullptr)break;
-    //     // std::cout << t->getValue() << '\n';
-    //     for (int i = 1; i <= 60; ++i)
-    //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
-    //     if (k < t->getValue()){
-    //         preNode = t; t = t->childNode[0].first; idx = 0;
-    //         for (int i = 1; i <= 60; ++i)
-    //             funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
-    //                                         std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
-    //     } else 
-    //     if (k > t->getValue()){
-    //         preNode = t; t = t->childNode[1].first; idx = 1;
-    //         for (int i = 1; i <= 60; ++i)
-    //             funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
-    //                                         std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
-    //     } else {
-    //         int rr = ResourceManager::StringtoInt(t->m_text_directions[RIGHT].getString());
-    //         if (rr){
-    //             if (rr == 2)
-    //                 funcQueue.push(Animation({std::bind(&Node::setTextRight, t, "")},
-    //                                 {},{},{})); 
-    //             else
-    //                 funcQueue.push(Animation({std::bind(&Node::setTextRight, t, std::to_string(rr-1))},
-    //                                 {},{},{})); 
-    //         } else {
-    //             std::shared_ptr <Node> rightMin = t->childNode[1].first, startCheckNode;
-    //             //tim rightMin
-    //             if (rightMin != nullptr){
-    //                 for (int i = 1; i <= 60; ++i)
-    //                     funcQueue.push(Animation({std::bind(&DynArrow::setPartialColor, t->childNode[1].second, i/60.f)},{},{},{}));                    
-    //                 for (int i = 1; i <= 60; ++i)
-    //                     funcQueue.push(Animation({std::bind(&Node::setSearching, rightMin, i/60.f)},{},{},{}));                    
-    //                 while (rightMin->childNode[0].first != nullptr){
-    //                     for (int i = 1; i <= 60; ++i)
-    //                         funcQueue.push(Animation({std::bind(&Node::removeSearching, rightMin, i/60.f),
-    //                                             std::bind(&DynArrow::setPartialColor, rightMin->childNode[0].second, i/60.f)},{},{},{}));
-    //                     rightMin = rightMin->childNode[0].first;
-    //                     for (int i = 1; i <= 60; ++i)
-    //                         funcQueue.push(Animation({std::bind(&Node::setSearching, rightMin, i/60.f)},{},{},{})); 
-    //                 }
-    //                 startCheckNode = rightMin->prevNode;
-    //             } else {
-    //                 startCheckNode = t->prevNode;
-    //             }
-    //             //xoa node t
-    //             for (int i = 1; i <= 60; ++i)
-    //                 funcQueue.push(Animation({std::bind(&Node::changeSizeNode, t, CircleRad/60.f)},{},{},{}));
-    //             //noi cac arrow
-    //             auto setFunction = [t,rightMin,startCheckNode, this]{
-    //                 for (int i = 0; i < t->childNode.size(); ++i)
-    //                     if (t->childNode[i].first != nullptr){
-    //                         t->childNode[i].second.setTail(t->m_position);
-    //                     }
-    //                 if (rightMin != nullptr){
-    //                     if (rightMin->prevNode != t){ // connect parent cua node moi voi node con cua node moi
-    //                         for (int i = 0; i < rightMin->prevNode->childNode.size(); ++i)
-    //                             if (rightMin->prevNode->childNode[i].first == rightMin){
-    //                                 rightMin->prevNode->childNode[i].first = rightMin->childNode[1].first;
-    //                                 if (rightMin->childNode[1].first != nullptr)
-    //                                     rightMin->prevNode->childNode[i].second.setTail(rightMin->childNode[1].first->m_position),
-    //                                     rightMin->childNode[1].first->prevNode = rightMin->prevNode;
-    //                                 else rightMin->prevNode->childNode[i].second.setTail(rightMin->prevNode->m_position);
-    //                                 break;
-    //                             }
-    //                         auto setPositionLambda = [startCheckNode,this]() {
-    //                             balancePosition();
-    //                         };
-    //                         funcQueue.push(Animation({},{},{},{setPositionLambda}));
-    //                         auto setPosition2Lambda = [startCheckNode,this]() {
-    //                             checkBalance(startCheckNode);
-    //                         };
-    //                         funcQueue.push(Animation({},{},{},{setPosition2Lambda}));
-    //                     } else {
-    //                         auto setPositionLambda = [rightMin,this]() {
-    //                             balancePosition();
-    //                         };
-    //                         funcQueue.push(Animation({},{},{},{setPositionLambda}));
-    //                         auto setPosition2Lambda = [rightMin,this]() {
-    //                             checkBalance(rightMin);
-    //                         };
-    //                         funcQueue.push(Animation({},{},{},{setPosition2Lambda}));
-    //                     }
+void MaxHeap::remove(int vtx){
+    clearQueue(); resetNode(); balancePosition(); checkFunctionFast(); 
+    if (numValue == 0 || vtx > numValue)return;
+    listNode[vtx]->setText(std::to_string(listNode[1]->getValue() + 1));
 
-    //                     if (t->prevNode != nullptr) // connect parent cua t voi node moi
-    //                         for (int i = 0; i < t->prevNode->childNode.size(); ++i)
-    //                             if (t->prevNode->childNode[i].first == t){
-    //                                 t->prevNode->childNode[i].first = rightMin;
-    //                                 t->prevNode->childNode[i].second.setTail(rightMin->m_position);
-    //                                 break;
-    //                     }
-    //                     rightMin->prevNode = t->prevNode;
-                        
-    //                     //connect node con cua t thanh node con cua node moi
-    //                     for (int i = 0; i < t->childNode.size(); ++i)if (t->childNode[i].first != rightMin){
-    //                             if (t->childNode[i].first != nullptr){
-    //                                 if (rightMin->childNode[i].first != nullptr)
-    //                                     rightMin->childNode[i].second.setTail(t->childNode[i].first->m_position);
-    //                                 else {
-    //                                     rightMin->childNode[i].second = DynArrow(rightMin->m_position, rightMin->m_position);
-    //                                     rightMin->childNode[i].second.setTail(t->childNode[i].first->m_position);
-    //                                 }
-    //                                 t->childNode[i].first->prevNode = rightMin;
-    //                             } else {
-    //                                 if (rightMin->childNode[i].first != nullptr)
-    //                                     rightMin->childNode[i].second.setTail(rightMin->m_position);
-    //                             }
-    //                             rightMin->childNode[i].first = t->childNode[i].first;
-    //                         }
-    //                     if (graph.pHead == t) graph.pHead = rightMin;
-                            
-    //                 } else {
-    //                     for (int i = 0; i < t->childNode.size(); ++i)
-    //                         if (t->childNode[i].first != nullptr){
-    //                             t->childNode[i].first->prevNode = t->prevNode;
-    //                         }
+    for (int i = 1; i <= 60; ++i)
+        funcQueue.push(Animation({std::bind(&Node::setSearching, listNode[vtx], i/60.f)},{},{},{}));
 
-    //                     if (t->prevNode != nullptr)
-    //                         for (int i = 0; i < t->prevNode->childNode.size(); ++i)
-    //                             if (t->prevNode->childNode[i].first == t){
-    //                                 t->prevNode->childNode[i].first = t->childNode[0].first;
-    //                                 if (t->childNode[0].first != nullptr)
-    //                                     t->prevNode->childNode[i].second.setTail(t->childNode[0].first->m_position);
-    //                                 else t->prevNode->childNode[i].second.setTail(t->prevNode->m_position);
-    //                                 break;
-    //                     }
-
-    //                     if (graph.pHead == t) graph.pHead = t->childNode[0].first;
-
-    //                     auto setPositionLambda = [t,this]() {
-    //                         balancePosition();
-    //                     };
-    //                     funcQueue.push(Animation({},{},{},{setPositionLambda}));
-    //                     auto setPosition2Lambda = [t,this]() {
-    //                         checkBalance(t->prevNode);
-    //                     };
-    //                     funcQueue.push(Animation({},{},{},{setPosition2Lambda}));
-    //                 }
-    //             };
-    //             funcQueue.push(Animation({},{},{},{setFunction}));
-    //         }
-    //         break;
-    //     }
-    //     // for (int i = 1; i <= 60; ++i)
-    //     //         funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
-    // }
-    // // std::cout << 123456 << '\n';
+    auto funcLambda = [this,vtx](){
+        runUp(vtx,1);
+    };
+    funcQueue.push(Animation({},{},{},{funcLambda}));
 }
 
 void MaxHeap::draw(sf::RenderTarget& target, sf::RenderStates states) const{

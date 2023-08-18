@@ -17,7 +17,7 @@ public:
     void insert(int);
     void remove(int);
     void getTop();
-    void runUp(int);
+    void runUp(int,int);
     void runDown(int);
     void checkFunction() override;
     void checkFunctionFast() override;
