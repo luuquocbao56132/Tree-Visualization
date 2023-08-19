@@ -70,32 +70,8 @@ DataTypes::DataTypes():
             
             // newNode = nullptr; isThemChange = 0;
         }
-
-// void DataTypes::resetAll(){
-//     buttonState = -1;
-//     xtime = 1.f; numFrame = 60;
-//     inputBox.clear();
-//     Graph newGraph = Graph(typeGraph);
-//     mainGraph = newGraph;
-//     // std::cout << "size node of mainGraph: \n";
-//     // for (int i = 0; i < mainGraph.listNode.size(); ++i)
-//     //     std::cout << mainGraph.listNode[i]->getRad() << " "; std::cout << '\n';
-    
-//     firstGraph = mainGraph;
-//     for (int i = 0; i < firstGraph.listNode.size(); ++i)
-//         firstGraph.listNode[i]->changeSizeNode(firstGraph.listNode[i]->getRad() - CircleRad);
-//     timeText = sf::Text(std::to_string((int)xtime) + "x", ResourceManager::getFont(), 25);
-//     timeText.setPosition(sf::Vector2f(upSpeed.getPosition().x - 50,buttonSize.y/2-10));
-//     timeText.setFillColor(TextColor[typeTheme]);
-//     numFrame = 1.f/xtime * 60;
-//     // for (int i = 0; i < firstGraph.listNode.size(); ++i)
-//     //     std::cout << firstGraph.listNode[i]->getValue() << " "; std::cout << '\n';
-// }
-
-void DataTypes::checkFunction(){
-}
-void DataTypes::checkFunctionFast(){
-}
+void DataTypes::checkFunction(){}
+void DataTypes::checkFunctionFast(){}
 
 void DataTypes::clearQueue(){
     while (!funcQueue.empty())funcQueue.pop();

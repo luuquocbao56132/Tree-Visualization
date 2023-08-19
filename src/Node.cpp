@@ -50,7 +50,9 @@ Node::Node(float radius, const std::string& text, const sf::Font& font, float te
     m_text_directions[LEFT].setOrigin(m_text_directions[LEFT].getLocalBounds().width / 2.f, m_text_directions[LEFT].getLocalBounds().height);
     m_text_directions[LEFT].setPosition(sf::Vector2f(position.x - radius - text_size, position.y));
 
-    childNode.resize(numChild);
+    childNode.clear();
+    for (int i = 0; i < numChild; ++i)
+        childNode.push_back({nullptr, DynArrow(sf::Vector2f(0,0), sf::Vector2f(0,0))});
     // nextArrow = DynArrow(60, sf::Color::Black, sf::Vector2f(position.x + radius + 3, position.y), 0.f);
 }
 

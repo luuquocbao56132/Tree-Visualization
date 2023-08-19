@@ -7,12 +7,14 @@
 class InputBox: public sf::Drawable, public sf::Transformable{
 public: 
     InputBox(sf::Vector2f , sf::Vector2f, std::string, bool);
+    InputBox(sf::Vector2f , sf::Vector2f, std::string, bool, bool);
     void setValue(int);
     int getValue();
+    std::string getString();
     void resetValue();
     void setValueLimit(std::shared_ptr <int> );
     
-    bool cursorOn;
+    bool cursorOn, isCharacter;
     sf::FloatRect getGlobalBounds() const;
     void checkPress(sf::Vector2f );
     void handleEvent(const sf::Event& );
