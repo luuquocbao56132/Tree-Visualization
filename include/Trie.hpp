@@ -22,6 +22,7 @@ public:
     void checkPositionFast(std::shared_ptr <Node> );
     void checkArrowFast(std::shared_ptr <Node> );
     void insertNode(std::string, std::shared_ptr <Node>);
+    void removingNode(std::shared_ptr <Node>);
     void insert(std::string);
     void remove(std::string);
     void search(std::string);

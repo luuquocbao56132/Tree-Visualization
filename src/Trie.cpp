@@ -187,6 +187,7 @@ void Trie::insertNode(std::string k, std::shared_ptr <Node> nod){
 }
  
 void Trie::insert(std::string k){
+    checkFunctionFast(); 
     if (k == "")return;
     clearQueue(); 
     resetNode(graph.pHead); 
@@ -238,17 +239,109 @@ void Trie::fromfile(){
 }
 
 void Trie::search(std::string k){
-    clearQueue(); resetNode(graph.pHead); balancePosition(graph.pHead,0, leftLimitBound); checkFunctionFast(); 
-    std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
-    std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
-    int idx = 0;
+    checkFunctionFast();  clearQueue(); resetNode(graph.pHead); balancePosition(graph.pHead,0, leftLimitBound); checkFunctionFast(); 
+    std::cout << " k = " << k << '\n';
+    std::shared_ptr <Node> t = graph.pHead;
+    
+    while (k != ""){
+        for (int j = 1; j <= 60; ++j)
+            funcQueue.push(Animation({std::bind(&Node::setSearching, t, j/60.f)},{},{},{}));
+        std::string x = k.substr(0,1); k.erase(0,1); bool flag = 0;
+        for (int i = 0; i < t->childNode.size(); ++i)
+            if (t->childNode[i].first->getString() == x){
+                flag = 1; 
+                for (int j = 1; j <= 60; ++j)
+                    funcQueue.push(Animation({std::bind(&DynArrow::setPartialColor, t->childNode[i].second, j/60.f),
+                                        std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+                t = t->childNode[i].first; break;
+            }
+        if (flag)continue;
+        for (int j = 1; j <= 60; ++j)
+            funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+        return;
+    }
+    if (t->getHeight() == 0){
+        for (int j = 1; j <= 60; ++j)
+            funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+        return;
+    }
+}
+
+void Trie::removingNode(std::shared_ptr <Node> nod){
+    for (int j = 1; j <= 60; ++j)
+        funcQueue.push(Animation({std::bind(&Node::setSearching, nod, j/60.f)},{},{},{}));
+    if (nod == graph.pHead || nod->getHeight() == 1 || !nod->childNode.empty()){
+        for (int j = 1; j <= 60; ++j)
+            funcQueue.push(Animation({std::bind(&Node::removeSearching, nod, j/60.f)},{},{},{}));
+        auto funcc = [this](){
+            resetNode(graph.pHead);
+        };
+        funcQueue.push(Animation({},{},{},{funcc}));
+        return;
+    }
+
+    std::cout << "removingNode: " << nod->getString() << '\n';
+
+    auto funcLambda = [this,nod](){
+        int idx = 0;
+        for (int i = 0; i < (int)nod->prevNode->childNode.size(); ++i)
+            if (nod->prevNode->childNode[i].first == nod){
+                idx = i;
+                funcQueue.push(Animation({std::bind(&DynArrow::setTail, nod->prevNode->childNode[i].second,
+                                        nod->prevNode->m_position)},{},{},{}));
+                break;
+            }
+        for (int i = 1; i <= 60; ++i)
+            funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, CircleRad/60.f)},{},{},{}));
+        auto funcc = [this,nod,idx](){           
+            nod->prevNode->childNode.erase(nod->prevNode->childNode.begin() + idx);
+            balancePosition(graph.pHead, 0, leftLimitBound);
+            removingNode(nod->prevNode);
+        };
+        funcQueue.push(Animation({},{},{},{funcc}));
+    };
+    funcQueue.push(Animation({},{},{},{funcLambda}));
 }
 
 void Trie::remove(std::string k){
-    clearQueue(); resetNode(graph.pHead); balancePosition(graph.pHead,0, leftLimitBound); checkFunctionFast(); 
-    std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
-    std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
+    checkFunctionFast(); clearQueue(); resetNode(graph.pHead); balancePosition(graph.pHead,0, leftLimitBound); checkFunctionFast(); 
+    std::cout << " k = " << k << '\n';
+    std::shared_ptr <Node> t = graph.pHead;
     
+    while (k != ""){
+        for (int j = 1; j <= 60; ++j)
+            funcQueue.push(Animation({std::bind(&Node::setSearching, t, j/60.f)},{},{},{})); 
+        std::string x = k.substr(0,1); bool flag = 0;
+        for (int i = 0; i < t->childNode.size(); ++i)
+            if (t->childNode[i].first->getString() == x){
+                flag = 1; 
+                for (int j = 1; j <= 60; ++j)
+                    funcQueue.push(Animation({std::bind(&DynArrow::setPartialColor, t->childNode[i].second, j/60.f),
+                                        std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+                t = t->childNode[i].first; 
+                k.erase(0,1); break;
+            }
+        for (int j = 1; j <= 60; ++j)
+            funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+        if (flag)continue;
+        return;
+    }
+    funcQueue.push(Animation({std::bind(&Node::setDefault, t)},{},{},{}));
+    for (int j = 1; j <= 60; ++j)
+        funcQueue.push(Animation({std::bind(&Node::setSearching, t, j/60.f)},{},{},{}));
+
+    if (t->getHeight() == 0){
+        for (int j = 1; j <= 60; ++j)
+            funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+        return;
+    }
+
+    auto funcLambda = [this,t](){
+        t->setHeight(0);
+        funcQueue.push(Animation({},{},{},{std::bind(&Node::setDefault, t)}));
+        removingNode(t);
+    };
+    funcQueue.push(Animation({},{},{},{funcLambda}));
 }
 
 void Trie::draw(sf::RenderTarget& target, sf::RenderStates states) const{
