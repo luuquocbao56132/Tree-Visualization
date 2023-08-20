@@ -26,6 +26,7 @@ public:
 
     void setSearching(float);
     void setDel(float);
+    void setDefault();
     void removeSearching(float);
     void setFound(float);
     void removeFound(float);

@@ -17,15 +17,16 @@ void Trie::resetNode(std::shared_ptr <Node> res){
         resetNode(res->childNode[i].first);
 }
 
-Trie::Trie(): DataTypes(), graph(), leftLimitBound(50){
+Trie::Trie(): DataTypes(), graph(), leftLimitBound(60){
     for (int i = 2; i <= 4; ++i){
         auto x = BaseButton[i];
         BaseButton[i]->inputButton.clear();
+        BaseButton[i]->setPosition(BaseButton[i]->getPosition() + sf::Vector2f(120*(i-2), 0));
         x->inputButton.push_back(std::make_shared <InputBox> (sf::Vector2f(x->getPosition().x + x->getSize().x + 40, 
                                                                             x->getPosition().y), 
-                                                                        inputButtonSize,"x = ",1,1));
+                                                                        sf::Vector2f(inputButtonSize.x*2,inputButtonSize.y),"x = ",1,1));
     }
-    initGraph(ResourceManager::random(5, 50));
+    initGraph(ResourceManager::random(5, 10));
     clearQueue();
     resetNode(graph.pHead);
     balancePosition(graph.pHead, 0, leftLimitBound);
@@ -35,7 +36,7 @@ Trie::Trie(): DataTypes(), graph(), leftLimitBound(50){
 void Trie::initGraph(int n){
     // std::vector <int> t = {30,29,28,27,26};
     // for (int i : t)insert(i);
-    graph.pHead = std::make_shared <Node> (19.f, "Head", ResourceManager::getFont(), 
+    graph.pHead = std::make_shared <Node> (17.f, "", ResourceManager::getFont(), 
                         textSize, backgroundColor,sf::Vector2f(1900/2,135),CIRCLE,0);
     graph.pHead->setHeight(0);
     for(int i = 1; i <= n; ++i){
@@ -134,8 +135,8 @@ std::shared_ptr <Node> Trie::newNode(std::string k, std::shared_ptr <Node> t){
                         textSize, backgroundColor,(t == nullptr ? sf::Vector2f(0,0) : t->getNodePosition()),
                         CIRCLE,0);
     nod->changeSizeNode(CircleRad);
-    for (int i = 1; i <= 60; ++i)
-                funcQueue.push(Animation({std::bind(&Node::setSearching, nod, i/60.f)},{},{},{}));
+    // for (int i = 1; i <= 60; ++i)
+    //             funcQueue.push(Animation({std::bind(&Node::setSearching, nod, i/60.f)},{},{},{}));
     funcQueue.push(Animation({std::bind(&Node::changeSizeNode, nod, nod->getRad()-CircleRad)},{},{},{}));
     nod->prevNode = t;
     nod->setHeight(0);
@@ -144,39 +145,41 @@ std::shared_ptr <Node> Trie::newNode(std::string k, std::shared_ptr <Node> t){
 }
 
 void Trie::insertNode(std::string k, std::shared_ptr <Node> nod){
+    for (int j = 1; j <= 60; ++j)
+        funcQueue.push(Animation({std::bind(&Node::setSearching, nod, j/60.f)},{},{},{}));
     if (k == ""){
         auto funcLambda = [this,nod](){
             nod->setHeight(1);
+            funcQueue.push(Animation({},{},{},{std::bind(&Node::setDefault, nod)}));
             for (int i = 1; i <= 60; ++i)
                 funcQueue.push(Animation({std::bind(&Node::setFound, nod, i/60.f)},{},{},{}));
         };
         funcQueue.push(Animation({},{},{},{funcLambda}));
         return;
     }
-    std::string x = k.substr(0,1); bool flag = 0;
+    std::string x = k.substr(0,1); k.erase(0,1); bool flag = 0;
     // std::cout << k << " x12: " << x  << '\n'; Sleep(1000);
-    k.erase(0,1);
     for (int i = 0; i < nod->childNode.size(); ++i)
         if (nod->childNode[i].first != nullptr && nod->childNode[i].first->getString() == x){
             for (int j = 1; j <= 60; ++j)
                 funcQueue.push(Animation({std::bind(&DynArrow::setPartialColor, nod->childNode[i].second, j/60.f),
-                                        std::bind(&Node::setSearching, nod, j/60.f)},{},{},{}));
+                                        std::bind(&Node::removeSearching, nod, j/60.f)},{},{},{}));
             flag = 1; nod = nod->childNode[i].first; break;
         }
     if (!flag){
         auto neww = newNode(x, nod);
         // std::cout << neww->getString() << '\n'; Sleep(500);
         nod->childNode.push_back({neww, DynArrow(nod->m_position, nod->m_position)});
-        balancePosition(graph.pHead, 0, leftLimitBound); 
-        nod->childNode.back().second = DynArrow(nod->m_position, nod->m_position);
+        auto setPositionLambda = [this]() {
+            balancePosition(graph.pHead, 0, leftLimitBound); 
+        };
+        funcQueue.push(Animation({},{},{},{setPositionLambda}));
         funcQueue.push(Animation({std::bind(&DynArrow::setTail, nod->childNode.back().second, nod->childNode.back().first->m_position)},{},{},{}));
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&DynArrow::setPartialColor, nod->childNode.back().second, i/60.f),
-                                    std::bind(&Node::setSearching, neww, i/60.f)},{},{},{}));
+                                    std::bind(&Node::removeSearching, nod, i/60.f)},{},{},{}));
         nod = neww;
     }
-    for (int i = 1; i <= 60; ++i)
-        funcQueue.push(Animation({std::bind(&Node::removeSearching, nod, i/60.f)},{},{},{}));
     auto funcQ = [this, k, nod](){
         insertNode(k, nod);
     };

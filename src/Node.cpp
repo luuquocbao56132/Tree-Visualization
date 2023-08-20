@@ -274,6 +274,12 @@ void Node::removeFound(float ratio){
     // gameGlobal->runBreak();
 }
 
+void Node::setDefault(){
+    setOutlineColor(sf::Color::Black);
+    setNodeColor(FirstNodeColor);
+    setTextColor(textColorStart);
+}
+
 float Node::getLengthArrow(int id){
     return childNode[id].second.getLength();
 }
@@ -301,6 +307,9 @@ void Node::draw(sf::RenderTarget& target, sf::RenderStates states) const {
         if (std::min(abs(i.first->getNodePosition().x), abs(i.first->getNodePosition().y)) > 10 &&
             std::min(abs(getNodePosition().x), abs(getNodePosition().y)) > 10)
             target.draw(i.second, states);
+    }
+
+    for (auto i : childNode)if (i.first){
         target.draw(*i.first, states);
     }
 

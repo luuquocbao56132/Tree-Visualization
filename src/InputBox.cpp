@@ -124,11 +124,11 @@ void InputBox::handleEvent(const sf::Event& event){
             m_cursorPos--; m_cursor.setPosition(m_cursor.getPosition() - sf::Vector2f(charLength,0));
         }
     } else if (event.key.code >= sf::Keyboard::A && event.key.code <= sf::Keyboard::Z && isCharacter){
-        if (m_cursorPos < 2){
+        if (m_cursorPos < 10){
             std::string t = m_text.getString();
             char charInput = event.key.code - sf::Keyboard::A + 'A';
             t.insert(m_cursorPos, std::string(1,charInput));
-            if (t.size() > 10)return;
+            if (t.size() > 8)return;
             m_text.setString(t);
             m_cursorPos++; m_cursor.setPosition(m_cursor.getPosition() + sf::Vector2f(charLength,0));
         }
