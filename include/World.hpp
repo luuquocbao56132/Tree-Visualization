@@ -12,6 +12,7 @@
 #include <MaxHeap.hpp>
 #include <MinHeap.hpp>
 #include <Trie.hpp>
+#include <Twothree.hpp>
 class World: public sf::Transformable, public sf::Drawable, private sf::NonCopyable {
 public:
     std::shared_ptr <DataTypes> liveData;

@@ -26,6 +26,7 @@ Trie::Trie(): DataTypes(), graph(), leftLimitBound(60){
                                                                             x->getPosition().y), 
                                                                         sf::Vector2f(inputButtonSize.x*2,inputButtonSize.y),"x = ",1,1));
     }
+    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (10));
     initGraph(ResourceManager::random(5, 10));
     clearQueue();
     resetNode(graph.pHead);
@@ -40,7 +41,7 @@ void Trie::initGraph(int n){
                         textSize, backgroundColor,sf::Vector2f(1900/2,135),CIRCLE,0);
     graph.pHead->setHeight(0);
     for(int i = 1; i <= n; ++i){
-        int length = ResourceManager::random(1, 9);
+        int length = ResourceManager::random(1, 8);
         std::string s = "";
         for (int j = 1; j <= length; ++j)
             s += (char)ResourceManager::random((int)('A'), (int)('Z'));
@@ -201,12 +202,23 @@ void Trie::insert(std::string k){
     funcQueue.push(Animation({},{},{},{funcQ}));
 }
 
+void clearChild(std::shared_ptr <Node> nod){
+    if (nod == nullptr)return;
+    for (int i = 0; i < nod->childNode.size(); ++i)
+        clearChild(nod->childNode[i].first);
+    nod->childNode.clear();
+}
+
 void Trie::fromfile(){
     std::ifstream file("customInput.txt"); // open the file
+    std::vector <std::string> lineVector;
     std::string line;
     if (file.is_open()) { // check if the file is successfully opened
         while (std::getline(file, line)) { // read the file line by line
             std::cout << line << '\n'; // print each line to the console
+            for (int i = 0; i < (int)line.size(); ++i)
+                if (line[i] == ' ' || line[i] == '\t' || line[i] == ';')line.erase(i,1), --i;
+            lineVector.push_back(line);
         }
         file.close(); // close the file
     }
@@ -214,21 +226,8 @@ void Trie::fromfile(){
         std::cerr << "Unable to open file\n";
     }
 
-    std::string c;
-    std::vector <std::string> list;
-    for (int i = 0; i < line.size(); ++i){
-        if (line[i] >= '0' && line[i] <= '9')c += line[i]; else
-        if (line[i] == ';' || line[i] == ','){
-            if (c.empty())return;
-            while (c[0] == '0')c.erase(0);
-            if (c.size() > 3)return;
-            if (c.size() == 0)c = "0";
-            list.push_back(c); c = "";
-        } else return;
-    }
-
-    clearQueue(); graph.pHead = nullptr;
-    for(std::string i : list){
+    clearQueue(); clearChild(graph.pHead);
+    for (std::string i : lineVector){
         insert(i);
         checkFunctionFast(); 
     }
