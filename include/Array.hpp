@@ -42,6 +42,10 @@ public:
     void getStep(int );
     void saveStep();
 
+    bool isDel(int );
+    void setDel(int );
+    void unDel(int );
+
     int typeArray, numArrow, nowStep;
     int n, numValue;
     std::vector <std::shared_ptr <Node>> listNode;
@@ -52,6 +56,7 @@ public:
     std::shared_ptr <Node> newNode;
     int leftBound, numberNow, isListNew;
     std::set <int> setNumber;
+    std::vector <bool> isDell;
 };
 
 #endif //Array_hpp

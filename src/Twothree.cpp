@@ -316,7 +316,8 @@ void Twothree::search(int k){
         flag = 0;
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, i/60.f)},{},{},{}));
-
+// fix loi search ko tim duoc node moi dc insert, fix danh dau del hashtable
+// asfsf
         for (int i = 0; i < t->listValue.size(); ++i)
             if (k == ResourceManager::StringtoInt(t->listValue[i].getString())){
                 funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, t)},{},{},{}));

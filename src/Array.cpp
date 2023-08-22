@@ -26,13 +26,13 @@ void Array::init(){
 
 void Array::init(int x){
     std::vector <std::string> s;
-    int k = ResourceManager::random(0,x-1);
+    int k = ResourceManager::random(0,std::max(0,x/3-1));
     for (int i = 0; i <= k; ++i)s.push_back(std::to_string(randomNodeValue()));
     init(x,s);
 }
 
 void Array::init(int x, std::vector <std::string> s){
-    n = x; listNode.clear(); numValue = s.size(); 
+    n = x; listNode.clear(); numValue = s.size(); isDell.assign(n+5,0);
     if (!n)return;
 
     for (int i = 0; i < x; ++i){
@@ -69,6 +69,18 @@ void Array::setValue(int vtx, int value){
     setNumber.erase(listNode[vtx]->getValue());
     listNode[vtx]->setText(std::to_string(value));
     setNumber.insert(value);
+}
+
+bool Array::isDel(int idx){
+    return isDell[idx];
+}
+
+void Array::setDel(int idx){
+    isDell[idx] = 1;
+}
+
+void Array::unDel(int idx){
+    isDell[idx] = 0;
 }
 
 void Array::setSize(int nn){n = nn;}

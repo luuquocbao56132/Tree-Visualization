@@ -128,23 +128,29 @@ void HashTable::insert(int x){
         return;
     }
     
-    int j = x % graph.getSize();
+    int j = x % graph.getSize(), first = (j - 1 < 0 ? j = graph.getSize()-1 : j - 1);
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{},{},{}));
     
-    while (graph.listNode[j]->getString() != ""){
+    while (graph.listNode[j]->getString() != "" && !graph.isDel(j) && j != first){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
         ++j; if (j == graph.getSize())j = 0;
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{}, {},{}));
     }
+
+    if (j == first){
+        for (int i = 1; i <= 60; ++i)
+            funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
+        return;
+    }
     
     for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::setFoundNode, &graph, j, i/60.f)}, {},
                                     {std::bind(&Node::setText, graph.listNode[j], std::to_string(x))},{}));
-    funcQueue.push(Animation({}, {}, {}, {[&](){
-        ++graph.numValue;
+    funcQueue.push(Animation({}, {}, {}, {[this,j](){
+        ++graph.numValue; graph.unDel(j);
     }}));
     // for (int i = 0; i < graph.getSize(); ++i)std::cout << graph.listNode[i]->getString() << ' '; std::cout << '\n';
     // for (int i = 0; i < firstGraph.getSize(); ++i)std::cout << firstGraph.listNode[i]->getString() << ' '; std::cout << '\n';
@@ -153,11 +159,10 @@ void HashTable::insert(int x){
 void HashTable::remove(int x){
     clearQueue(); resetNode(); 
 
-    int j = x % graph.getSize();
+    int j = x % graph.getSize(), first = (j - 1 < 0 ? j = graph.getSize()-1 : j - 1);
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{},{},{}));
-
-    while (graph.listNode[j]->getString() != "" && graph.listNode[j]->getString() != std::to_string(x)){
+    while ((graph.isDel(j) || graph.listNode[j]->getString() != "") && graph.listNode[j]->getString() != std::to_string(x) && j != first){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
         ++j; if (j == graph.getSize())j = 0;
@@ -165,30 +170,38 @@ void HashTable::remove(int x){
             funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{}, {},{}));
     }
 
+    if (graph.listNode[j]->getString() == "" || j == first){
+        for (int i = 1; i <= 60; ++i)
+            funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
+        return;
+    }
+
+    funcQueue.push(Animation({}, {}, {}, {std::bind(&Node::setText, graph.listNode[j], "Del"), [this, j](){
+        --graph.numValue; graph.setDel(j);
+    }}));
+
     for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::setFoundNode, &graph, j, i/60.f)}, {},{},{}));
-
-    std::cout << graph.numValue << '\n';
-
-    if (graph.listNode[j]->getString() == "")return;
-
-    funcQueue.push(Animation({}, {}, {}, {std::bind(&Node::setText, graph.listNode[j], ""), [&](){
-        --graph.numValue; 
-    }}));
 }
 
 void HashTable::search(int x){
     clearQueue(); resetNode();
 
-    int j = x % graph.getSize();
+    int j = x % graph.getSize(), first = (j - 1 < 0 ? j = graph.getSize()-1 : j - 1);
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{},{},{}));
-    while (graph.listNode[j]->getString() != ""){
+    while ((graph.isDel(j) || graph.listNode[j]->getString() != "") && graph.listNode[j]->getString() != std::to_string(x) && j != first){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
         ++j; if (j == graph.getSize())j = 0;
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{}, {},{}));
+    }
+
+    if (graph.listNode[j]->getString() == "" || j == first){
+        for (int i = 1; i <= 60; ++i)
+            funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
+        return;
     }
     for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::setFoundNode, &graph, j, i/60.f)}, {},{},{}));
