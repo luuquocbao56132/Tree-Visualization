@@ -225,6 +225,7 @@ void Twothree::insertNode(std::shared_ptr <TwothreeNode> t, std::shared_ptr <Two
                 listVal.push_back(i.getString());
             }
             if (!flag)listVal.push_back(std::to_string(val));
+            for (auto i : listVal)std::cout << ResourceManager::StringtoInt(i) << " "; std::cout << '\n';
 
             *t = *newNode(listVal, t->prevNode, t->m_position);
             for (int i = 1; i <= 60; ++i)
@@ -312,13 +313,12 @@ void Twothree::search(int k){
     bool flag = 0;
     if (t == nullptr)return;
 
-    do {
+    while (true) {
         flag = 0;
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, i/60.f)},{},{},{}));
-// fix loi search ko tim duoc node moi dc insert, fix danh dau del hashtable
-// asfsf
-        for (int i = 0; i < t->listValue.size(); ++i)
+        
+        for (int i = 0; i < t->listValue.size(); ++i){
             if (k == ResourceManager::StringtoInt(t->listValue[i].getString())){
                 funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, t)},{},{},{}));
                 for (int j = 1; j <= 60; ++j)
@@ -329,6 +329,7 @@ void Twothree::search(int k){
                 funcQueue.push(Animation({},{},{},{func}));
                 flag = 1; return;
             }
+        }
         
         for (int i = 0; i < t->listValue.size(); ++i)
             if (k < ResourceManager::StringtoInt(t->listValue[i].getString())){
@@ -340,8 +341,9 @@ void Twothree::search(int k){
         if (flag)continue;
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
+        if (t->childNode.empty())break;
         t = t->childNode.back().first;
-    } while (t->childNode.size() > 0);
+    }
 
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
