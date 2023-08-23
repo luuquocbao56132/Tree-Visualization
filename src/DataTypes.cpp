@@ -9,8 +9,7 @@ extern std::string theme;
 DataTypes::DataTypes():
         buttonSize(sf::Vector2f(90.f, 50.f)), buttonSpacing(sf::Vector2f(0.f, 5.f)),
         buttonPosition(sf::Vector2f(10.f, 780.f)), buttonRange(buttonSize + buttonSpacing),
-        buttonState(-1),
-        themeSet(){     
+        buttonState(-1){     
             MenuButton = Button(sf::Vector2f(10,10), sf::Vector2f(100,50), "Menu", ResourceManager::getFont(), 19, 0);
             caseSpeedButton = Button(sf::Vector2f(120,10), sf::Vector2f(100,50), "Case Speed", ResourceManager::getFont(), 19, 0);
             // upSpeed = Button(sf::Vector2f(980,10), sf::Vector2f(buttonSize.y/2,buttonSize.y/2), 
@@ -99,7 +98,6 @@ void DataTypes::setTheme(){
 
 void DataTypes::draw(sf::RenderTarget& target, sf::RenderStates states) const{
     // if (!isTurn)return;
-    target.draw(themeSet);
     target.draw(MenuButton);
     target.draw(caseSpeedButton);
     target.draw(graphSquare);
@@ -114,7 +112,6 @@ void DataTypes::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 }
 
 void DataTypes::checkHover(sf::Vector2f mousePos){
-    themeSet.HoverCheck(mousePos);
     MenuButton.checkHover(mousePos);
     caseSpeedButton.checkHover(mousePos);
     // upSpeed.checkHover(mousePos);
@@ -128,7 +125,7 @@ void DataTypes::checkHover(sf::Vector2f mousePos){
 
 void DataTypes::checkPress(sf::Vector2f mousePos){
     //if (LL_button.checkPress(mousePos))isTurn = 1;
-    if (MenuButton.checkPress(mousePos))clearQueue(), gameGlobal->mWorld.MenuState = 1, gameGlobal->mWorld.menu = Menu();
+    if (MenuButton.checkPress(mousePos))clearQueue(), gameGlobal->mWorld.MenuState = 1, gameGlobal->mWorld.menu.setTheme();
     if (caseSpeedButton.checkPress(mousePos))caseSpeed = !caseSpeed;
     for (int i = 0; i < BaseButton.size(); ++i)if (BaseButton[i]->checkPress(mousePos))
         buttonState = i, inputBox.clear(); 
@@ -136,7 +133,7 @@ void DataTypes::checkPress(sf::Vector2f mousePos){
     // if (downSpeed.checkPress(mousePos))xtime = std::max(xtime - 1, 1.f), timeText.setString(std::to_string((int)xtime) + "x");
     // if (previousButton.checkPress(mousePos))mainGraph.getStep(-1);
     // if (nextButton.checkPress(mousePos))mainGraph.getStep(1);
-    if (themeSet.checkPress(mousePos)) setTheme();
+    // if (themeSet.checkPress(mousePos)) setTheme();
     numFrame = 1.f/xtime * 60;
 }
 

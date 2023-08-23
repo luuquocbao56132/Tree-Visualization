@@ -10,7 +10,6 @@ public:
     Menu();
     Button bHash, bAVL, b234, bMinHeap, bMaxHeap, bTrie, bGraph;
 
-    Theme themeSet;
     void setTheme();
     int checkPress(sf::Vector2f);
     void HoverCheck(sf::Vector2f);

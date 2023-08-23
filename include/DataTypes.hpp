@@ -27,7 +27,6 @@ public:
     std::shared_ptr <Node> newNode;
     std::queue <Animation> funcQueue;
     Button upSpeed, downSpeed, previousButton, nextButton, MenuButton, caseSpeedButton;
-    Theme themeSet;
     sf::RectangleShape graphSquare;
     sf::Text timeText;
     // InputBox inpBox;

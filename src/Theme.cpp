@@ -2,7 +2,9 @@
 
 Theme::Theme(){
     themeBut = Button(sf::Vector2f(1790,10), sf::Vector2f(100,50),"Theme", ResourceManager::getFont(), 25, 0);
-    backGroundTexture.loadFromFile("./Image/"+theme+"background.png");
+    
+    if (!backGroundTexture.loadFromFile("./Image/"+theme+"background.png")) 
+        std::cout << "Error loading background image" << std::endl;
     backGroundSprite.setTexture(backGroundTexture);
 }
 

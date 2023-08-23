@@ -13,11 +13,13 @@
 #include <MinHeap.hpp>
 #include <Trie.hpp>
 #include <Twothree.hpp>
+#include <Theme.hpp>
 class World: public sf::Transformable, public sf::Drawable, private sf::NonCopyable {
 public:
     std::shared_ptr <DataTypes> liveData;
     Menu menu;
     bool MenuState;
+    Theme themeSet;
 
     World();
     void HoverCheck(sf::Vector2f);

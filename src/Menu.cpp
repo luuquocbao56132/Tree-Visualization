@@ -1,6 +1,6 @@
 #include <Menu.hpp>
 
-Menu::Menu(): themeSet(){
+Menu::Menu(){
     bHash = Button(sf::Vector2f(800.f, 420.f), sf::Vector2f(125.f, 60.f), "Hash Table", ResourceManager::getFont(), 20, 0);
     bAVL = Button(sf::Vector2f(800.f, 520.f), sf::Vector2f(125.f, 60.f), "AVL Tree", ResourceManager::getFont(), 20, 0);
     b234 = Button(sf::Vector2f(800.f, 620.f), sf::Vector2f(125.f, 60.f), "234 Tree", ResourceManager::getFont(), 20, 0);
@@ -42,12 +42,11 @@ int Menu::checkPress(sf::Vector2f mousePos){
     if (bMinHeap.checkPress(mousePos)){
         return 7;
     }
-    if (themeSet.checkPress(mousePos))setTheme();
+    // if (themeSet.checkPress(mousePos))setTheme();
     return 0;
 }
 
 void Menu::HoverCheck(sf::Vector2f mousePos){
-    themeSet.HoverCheck(mousePos);
     bHash.checkHover(mousePos);
     bAVL.checkHover(mousePos);
     b234.checkHover(mousePos);
@@ -58,7 +57,6 @@ void Menu::HoverCheck(sf::Vector2f mousePos){
 }
 
 void Menu::draw(sf::RenderTarget& target, sf::RenderStates states) const{
-    target.draw(themeSet);
     target.draw(bHash);
     target.draw(bAVL);
     target.draw(b234);

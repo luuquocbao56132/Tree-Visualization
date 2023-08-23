@@ -23,7 +23,8 @@ public:
     void checkPositionFast(std::shared_ptr <TwothreeNode> );
     void checkArrowFast(std::shared_ptr <TwothreeNode> );
     void insertNode(std::shared_ptr <TwothreeNode> , std::shared_ptr <TwothreeNode> , int , int, bool);
-    void removingNode(std::shared_ptr <TwothreeNode> );
+    void removingNode(std::shared_ptr <TwothreeNode>, int);
+    void continueRemove(std::shared_ptr <TwothreeNode>, int);
     void insert(int);
     void remove(int);
     void search(int);
