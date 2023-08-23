@@ -42,7 +42,7 @@ void Game::processEvents(){
                 mWorld.HoverCheck(mousePos);
                 break;
         }
-        if (event.type == sf::Event::KeyPressed){
+        if (event.type == sf::Event::KeyPressed && !mWorld.MenuState){
             mWorld.liveData->checkKeyInput(event);
         }
     }
