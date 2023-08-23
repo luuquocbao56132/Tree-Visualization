@@ -14,7 +14,7 @@ void Twothree::resetNode(std::shared_ptr <TwothreeNode> res){
 }
 
 Twothree::Twothree(): DataTypes(){
-    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (20));
+    BaseButton[1]->inputButton[0]->setValueLimit(std::make_shared <int> (50));
     initGraph(ResourceManager::random(10, 40));
     clearQueue();
     resetNode(root);
@@ -455,10 +455,14 @@ void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
 
                     funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, 1)},{},{},{}));
 
-                    t->childNode.push_back({left->childNode[0].first, DynArrow(t->m_position, left->childNode[0].first->m_position)});
-                    t->childNode.push_back({left->childNode[1].first, DynArrow(t->m_position, left->childNode[1].first->m_position)});
-                    t->childNode.push_back({right->childNode[0].first, DynArrow(t->m_position, right->childNode[0].first->m_position)});
-                    t->childNode.push_back({right->childNode[1].first, DynArrow(t->m_position, right->childNode[1].first->m_position)});
+                    for (int i = 0; i < (int)left->childNode.size(); ++i)
+                        t->childNode.push_back({left->childNode[i].first, DynArrow(t->m_position, left->childNode[i].first->m_position)}),
+                        left->childNode[i].first->prevNode = t;
+
+                    for (int i = 0; i < (int)right->childNode.size(); ++i)
+                        t->childNode.push_back({right->childNode[i].first, DynArrow(t->m_position, right->childNode[i].first->m_position)}),
+                        right->childNode[i].first->prevNode = t;
+
                     balancePosition(root, 0, 60);
                     continueRemove(t, val);
                 };
@@ -468,15 +472,10 @@ void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
                 auto funcQ = [this, t, idx, val](){
                     auto left = t->childNode[idx].first, right = t->childNode[idx+1].first;
                     auto ListChild = t->childNode;
-                    auto res = newNode({left->listValue[0].getString(), t->listValue[0].getString(), right->listValue[0].getString()}, 
+                    auto res = newNode({left->listValue[0].getString(), t->listValue[idx].getString(), right->listValue[0].getString()}, 
                                     t, (left->m_position + right->m_position) / 2.f);
-                    
-                    std::vector <std::string> listVal;
-                    bool flg = 0;
-                    for (auto i : t->listValue)
-                        if (ResourceManager::StringtoInt(i.getString()) != val || flg)listVal.push_back(i.getString());
-                            else flg = 1;
-                    *t = *newNode(listVal, t->prevNode, t->m_position);
+            
+                    *t = *newNode(getListDel(t->listValue, std::to_string(val)), t->prevNode, t->m_position);
 
                     funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, 1)},{},{},{}));
 
@@ -485,6 +484,7 @@ void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
                     for (int i = idx+2; i < ListChild.size(); ++i)t->childNode.push_back(ListChild[i]);
                     
                     balancePosition(root, 0, 60);
+                    funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, 1)},{},{},{}));
                     continueRemove(res, val);
                 };
                 funcQueue.push(Animation({},{},{},{funcQ})); 
@@ -495,7 +495,7 @@ void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
     //Case 3: Node is leaf, only 1 key
     if (t->childNode.empty() && t->listValue.size() == 1){
         auto preNode = t->prevNode;
-        int idx = 0;
+        int idx = 0, cnt = 0;
         while (preNode->childNode[idx].first != t)++idx;
 
         if (idx > 0){
@@ -509,6 +509,7 @@ void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
                     auto listChild = preNode->childNode;
                     *preNode = *newNode(getListDel(preNode->listValue, rightVal), preNode->prevNode, preNode->m_position);
                     *preNode = *newNode(getListIn(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
+                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, preNode, 1)},{},{},{}));
                     funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, preNode, 1)},{},{},{}));
                     for (auto i : listChild)preNode->childNode.push_back(i);
                     balancePosition(root, 0, 60);
@@ -529,6 +530,7 @@ void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
                     auto listChild = preNode->childNode;
                     *preNode = *newNode(getListDel(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
                     *preNode = *newNode(getListIn(preNode->listValue, rightVal), preNode->prevNode, preNode->m_position);
+                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, preNode, 1)},{},{},{}));
                     funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, preNode, 1)},{},{},{}));
                     for (auto i : listChild)preNode->childNode.push_back(i);
                     balancePosition(root, 0, 60);
@@ -540,78 +542,181 @@ void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
     }
 }
 
+std::shared_ptr <TwothreeNode> Twothree::checkAlone(std::shared_ptr <TwothreeNode> t){
+    if (t->listValue.size() > 1)return t;
+
+    if (t == root)return t;
+
+    auto preNode = t->prevNode;
+    int idx = 0, cnt = 0;
+    while (preNode->childNode[idx].first != t)++idx;
+
+    if (idx > 0){
+        if (preNode->childNode[idx-1].first->listValue.size() > 1){
+            std::string leftVal = preNode->childNode[idx-1].first->listValue.back().getString();
+            std::string rightVal = preNode->listValue[idx-1].getString();
+            auto leftChild = preNode->childNode[idx-1].first;
+            std::pair <std::shared_ptr <TwothreeNode>, DynArrow> res;
+            
+            auto listChild = leftChild->childNode;
+            *preNode->childNode[idx-1].first = *newNode(getListDel(preNode->childNode[idx-1].first->listValue, leftVal), 
+                                                        preNode, preNode->childNode[idx-1].first->m_position);
+            for (int i = 0; i < (int)listChild.size()-1; ++i)leftChild->childNode.push_back(listChild[i]);
+            if (!listChild.empty())res = listChild.back();
+
+            listChild = t->childNode;
+            *t = *newNode(getListIn(t->listValue, rightVal), preNode, t->m_position);
+            if (!leftChild->childNode.empty())t->childNode.push_back(res);
+            for (int i = 0; i < listChild.size(); ++i)t->childNode.push_back(listChild[i]);
+
+            listChild = preNode->childNode;
+            *preNode = *newNode(getListDel(preNode->listValue, rightVal), preNode->prevNode, preNode->m_position);
+            *preNode = *newNode(getListIn(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
+            funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, preNode, 1)},{},{},{}));
+            funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, preNode, 1)},{},{},{}));
+            for (auto i : listChild)preNode->childNode.push_back(i);
+            balancePosition(root, 0, 60);
+            
+            return t;
+        }
+    }
+
+    if (idx < preNode->childNode.size()-1){
+        if (preNode->childNode[idx+1].first->listValue.size() > 1){
+            std::string leftVal = preNode->listValue[idx].getString();
+            std::string rightVal = preNode->childNode[idx+1].first->listValue[0].getString();
+            auto rightChild = preNode->childNode[idx+1].first;
+            std::pair <std::shared_ptr <TwothreeNode>, DynArrow> res;
+
+            auto listChild = rightChild->childNode;
+            *preNode->childNode[idx+1].first = *newNode(getListDel(preNode->childNode[idx+1].first->listValue, rightVal), 
+                                                        preNode, preNode->childNode[idx+1].first->m_position);
+            for (int i = 1; i < listChild.size(); ++i)rightChild->childNode.push_back(listChild[i]);
+            if (!listChild.empty())res = listChild[0];
+
+            listChild = t->childNode;
+            *t = *newNode(getListIn(t->listValue, leftVal), preNode, t->m_position);
+            for (int i = 0; i < listChild.size(); ++i)t->childNode.push_back(listChild[i]);
+            if (!rightChild->childNode.empty())t->childNode.push_back(res);
+
+            listChild = preNode->childNode;
+            *preNode = *newNode(getListDel(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
+            *preNode = *newNode(getListIn(preNode->listValue, rightVal), preNode->prevNode, preNode->m_position);
+            funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, preNode, 1)},{},{},{}));
+            funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, preNode, 1)},{},{},{}));
+            for (auto i : listChild)preNode->childNode.push_back(i);
+
+            balancePosition(root, 0, 60);
+            return t;
+        } else {
+            std::string leftVal = preNode->listValue[idx].getString();
+            std::string rightVal = preNode->childNode[idx+1].first->listValue[0].getString();
+            auto rightChild = preNode->childNode[idx+1].first;
+            auto listChild = t->childNode;
+            *t = *newNode(getListIn(t->listValue, leftVal), preNode, t->m_position);
+            *t = *newNode(getListIn(t->listValue, rightVal), preNode, t->m_position);
+            for (auto i : listChild)t->childNode.push_back(i);
+            for (auto i : rightChild->childNode){
+                t->childNode.push_back(i);
+                i.first->prevNode = t;
+            }
+
+            listChild = preNode->childNode;
+            *preNode = *newNode(getListDel(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
+            if (preNode->listValue.size() == 0){
+                if (preNode->prevNode != nullptr)
+                    for (int i = 0; i < preNode->prevNode->childNode.size(); ++i)
+                        if (preNode->prevNode->childNode[i].first == preNode)
+                            {preNode->prevNode->childNode[i].first = t; break;}
+                t->prevNode = preNode->prevNode;
+                if (preNode == root)root = t;
+                return t;
+            }
+
+            for (int i = 0; i <= idx; ++i)preNode->childNode.push_back(listChild[i]);
+            for (int i = idx+2; i < listChild.size(); ++i)preNode->childNode.push_back(listChild[i]);
+            balancePosition(root, 0, 60);
+            return t;
+        }
+    }
+
+    --idx; t = preNode->childNode[idx].first;
+    std::string leftVal = preNode->listValue[idx].getString();
+    std::string rightVal = preNode->childNode[idx+1].first->listValue[0].getString();
+    auto rightChild = preNode->childNode[idx+1].first;
+    auto listChild = t->childNode;
+    *t = *newNode(getListIn(t->listValue, leftVal), preNode, t->m_position);
+    *t = *newNode(getListIn(t->listValue, rightVal), preNode, t->m_position);
+    for (auto i : listChild)t->childNode.push_back(i);
+    for (auto i : rightChild->childNode){
+        t->childNode.push_back(i);
+        i.first->prevNode = t;
+    }
+
+    listChild = preNode->childNode;
+    *preNode = *newNode(getListDel(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
+    if (preNode->listValue.size() == 0){
+        if (preNode->prevNode != nullptr)
+            for (int i = 0; i < preNode->prevNode->childNode.size(); ++i)
+                if (preNode->prevNode->childNode[i].first == preNode)
+                    {preNode->prevNode->childNode[i].first = t; break;}
+        t->prevNode = preNode->prevNode;
+        if (preNode == root)root = t;
+        return t;
+    }
+
+    for (int i = 0; i <= idx; ++i)preNode->childNode.push_back(listChild[i]);
+    for (int i = idx+2; i < listChild.size(); ++i)preNode->childNode.push_back(listChild[i]);
+    balancePosition(root, 0, 60);
+    return t;
+}
+
 void Twothree::continueRemove(std::shared_ptr <TwothreeNode> t, int k){
     std::shared_ptr <TwothreeNode> preNode = t->prevNode;
     bool flag = 0;
     if (t == nullptr)return;
 
-    while (true) {
-        flag = 0;
-        for (int i = 1; i <= 60; ++i)
-            funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, i/60.f)},{},{},{}));
-        
-        for (int i = 0; i < t->listValue.size(); ++i){
-            if (k == ResourceManager::StringtoInt(t->listValue[i].getString())){
-                flag = 1; break;
-            }
+    t = checkAlone(t);
+    for (int i = 1; i <= 60; ++i)
+        funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, i/60.f)},{},{},{}));
+    
+    for (int i = 0; i < t->listValue.size(); ++i){
+        if (k == ResourceManager::StringtoInt(t->listValue[i].getString())){
+            auto func = [this,t, k](){
+                removingNode(t, k);
+            };
+            funcQueue.push(Animation({},{},{},{func})); return;
         }
-
-        if (flag)break;
-        
-        for (int i = 1; i <= 60; ++i)
-            funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
-        if (t->childNode.empty())break;
-        for (int i = 0; i < t->listValue.size(); ++i)
-            if (k < ResourceManager::StringtoInt(t->listValue[i].getString())){
-                t = t->childNode[i].first;  flag = 1; break;
-            }
-
-        if (flag)continue;     
-        t = t->childNode.back().first;
     }
+    
+    for (int i = 1; i <= 60; ++i)
+        funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
+    if (t->childNode.empty())return;
 
-    if (!flag)return;
-    auto func = [this,t, k](){
-        removingNode(t, k);
+    for (int i = 0; i < t->listValue.size(); ++i)
+        if (k < ResourceManager::StringtoInt(t->listValue[i].getString())){
+            t = t->childNode[i].first; 
+            auto funcc = [this,t, k](){
+                continueRemove(t, k);
+            };
+            funcQueue.push(Animation({},{},{},{funcc})); return;
+        }
+ 
+    t = t->childNode.back().first;
+    auto funcc = [this,t, k](){
+        continueRemove(t, k);
     };
-    funcQueue.push(Animation({},{},{},{func}));
+    funcQueue.push(Animation({},{},{},{funcc})); return;
 }
 
 void Twothree::remove(int k){
     checkFunctionFast(); clearQueue(); resetNode(root); balancePosition(root, 0, 60); checkFunctionFast(); 
     std::cout << " k = " << k << '\n';
     std::shared_ptr <TwothreeNode> t = root, preNode = nullptr;
-    bool flag = 0;
     if (t == nullptr)return;
 
-    while (true) {
-        flag = 0;
-        for (int i = 1; i <= 60; ++i)
-            funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, i/60.f)},{},{},{}));
-        
-        for (int i = 0; i < t->listValue.size(); ++i){
-            if (k == ResourceManager::StringtoInt(t->listValue[i].getString())){
-                flag = 1; break;
-            }
-        }
-        std::cout << (std::string)t->listValue[0].getString() << '\n'; //Sleep(1500);
-        if (flag)break;
-        
-        for (int i = 1; i <= 60; ++i)
-            funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
-        if (t->childNode.empty())break;
-        for (int i = 0; i < t->listValue.size(); ++i)
-            if (k < ResourceManager::StringtoInt(t->listValue[i].getString())){
-                t = t->childNode[i].first;  flag = 1; break;
-            }
-
-        if (flag)continue;     
-        t = t->childNode.back().first;
-    }
-
-    if (!flag)return;
     auto func = [this,t, k](){
-        removingNode(t, k);
+        continueRemove(t, k);
     };
     funcQueue.push(Animation({},{},{},{func}));
 }
