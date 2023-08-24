@@ -43,6 +43,10 @@ void World::checkPress(sf::Vector2f mousePos){
             MenuState = 0;
             liveData = std::make_shared <Twothree> ();
             break;
+        case 4:
+            MenuState = 0;
+            liveData = std::make_shared <GraphMain> ();
+            break;
         case 5:
             MenuState = 0;
             liveData = std::make_shared <Trie> ();

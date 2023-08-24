@@ -14,6 +14,7 @@
 #include <Trie.hpp>
 #include <Twothree.hpp>
 #include <Theme.hpp>
+#include <GraphMain.hpp>
 class World: public sf::Transformable, public sf::Drawable, private sf::NonCopyable {
 public:
     std::shared_ptr <DataTypes> liveData;
