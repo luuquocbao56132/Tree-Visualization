@@ -1,6 +1,8 @@
 #include <AVL.hpp>
 
 void AVL::resetNode(std::shared_ptr <Node> res){
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "")},{}));
+
     if (res == nullptr)return;
     Node t = *res;
     *res = Node(19, t.getString(), ResourceManager::getFont(), textSize, backgroundColor, t.m_position, CIRCLE, 2);
@@ -327,6 +329,7 @@ void AVL::insert(int k){
     std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
     std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
     int idx = 0;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Find the position for new node")},{}));
     while (true){
         // std::cout << "out " << t << " ";
         // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
@@ -341,6 +344,7 @@ void AVL::insert(int k){
                 balancePosition();
             };
             funcQueue.push(Animation({},{},{},{setPositionLambda}));
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found, make new node here")},{}));
             break;
         }
         // std::cout << t->getValue() << '\n';
@@ -417,11 +421,47 @@ void AVL::search(int k){
     clearQueue(); resetNode(graph.pHead); balancePosition(); checkFunctionFast(); 
     std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
     std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Move down for searching node")},{}));
     int idx = 0;
     while (true){
         // std::cout << "out " << t << " ";
         // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
         if (t == nullptr){
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Don't have node")},{}));
+            break;
+        }
+        // std::cout << t->getValue() << '\n';
+        for (int i = 1; i <= 60; ++i)
+            funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
+        if (k < t->getValue()){
+            preNode = t; t = t->childNode[0].first; idx = 0;
+            for (int i = 1; i <= 60; ++i)
+                funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
+                                            std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Move to the left")},{}));
+        } else 
+        if (k > t->getValue()){
+            preNode = t; t = t->childNode[1].first; idx = 1;
+            for (int i = 1; i <= 60; ++i)
+                funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
+                                            std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Move to the right")},{}));
+        } else break;
+    }
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Founded")},{}));
+}
+
+void AVL::remove(int k){
+    clearQueue(); resetNode(graph.pHead); balancePosition(); checkFunctionFast(); 
+    std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
+    std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
+    int idx = 0;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Find node to remove")},{}));
+    while (true){
+        // std::cout << "out " << t << " ";
+        // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
+        if (t == nullptr){
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Dont have node")},{}));
             break;
         }
         // std::cout << t->getValue() << '\n';
@@ -438,34 +478,8 @@ void AVL::search(int k){
             for (int i = 1; i <= 60; ++i)
                 funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
                                             std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
-        } else break;
-    }
-}
-
-void AVL::remove(int k){
-    clearQueue(); resetNode(graph.pHead); balancePosition(); checkFunctionFast(); 
-    std::cout << "pHead: " << (graph.pHead == nullptr ? 0 : graph.pHead->getValue()) << " k = " << k << '\n';
-    std::shared_ptr <Node> t = graph.pHead, preNode = nullptr;
-    int idx = 0;
-    while (true){
-        // std::cout << "out " << t << " ";
-        // if (t != nullptr)std::cout << '\n' << t->prevNode << '\n';
-        if (t == nullptr)break;
-        // std::cout << t->getValue() << '\n';
-        for (int i = 1; i <= 60; ++i)
-            funcQueue.push(Animation({std::bind(&Node::setSearching, t, i/60.f)},{},{},{}));
-        if (k < t->getValue()){
-            preNode = t; t = t->childNode[0].first; idx = 0;
-            for (int i = 1; i <= 60; ++i)
-                funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
-                                            std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
-        } else 
-        if (k > t->getValue()){
-            preNode = t; t = t->childNode[1].first; idx = 1;
-            for (int i = 1; i <= 60; ++i)
-                funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
-                                            std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
         } else {
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found node, start to remove and trace back")},{}));
             int rr = ResourceManager::StringtoInt(t->m_text_directions[RIGHT].getString());
             if (rr){
                 if (rr == 2)
@@ -476,6 +490,7 @@ void AVL::remove(int k){
                                     {},{},{})); 
             } else {
                 std::shared_ptr <Node> rightMin = t->childNode[1].first, startCheckNode;
+                funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Find successor")},{}));
                 //tim rightMin
                 if (rightMin != nullptr){
                     for (int i = 1; i <= 60; ++i)
@@ -495,9 +510,11 @@ void AVL::remove(int k){
                     startCheckNode = t->prevNode;
                 }
                 //xoa node t
+                funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Delete node")},{}));
                 for (int i = 1; i <= 60; ++i)
                     funcQueue.push(Animation({std::bind(&Node::changeSizeNode, t, CircleRad/60.f)},{},{},{}));
                 //noi cac arrow
+                funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Reconstruct graph")},{}));
                 auto setFunction = [t,rightMin,startCheckNode, this]{
                     for (int i = 0; i < t->childNode.size(); ++i)
                         if (t->childNode[i].first != nullptr){

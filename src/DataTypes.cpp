@@ -21,7 +21,7 @@ DataTypes::DataTypes():
             // timeText.setPosition(sf::Vector2f(upSpeed.getPosition().x - 50,buttonSize.y/2-10));
             // timeText.setFillColor(TextColor[typeTheme]);
 
-            int i = 280;
+            int i = 300;
             std::shared_ptr<Button> FromFile (new Button(buttonPosition + sf::Vector2f(buttonPosition.x + 0*i, buttonRange.y),
                             buttonSize + sf::Vector2f(100,0), "Insert from file", ResourceManager::getFont(), 20,0));
             std::shared_ptr<Button> Random (new Button(buttonPosition + sf::Vector2f(buttonPosition.x + 1*i - 100, buttonRange.y),

@@ -1,6 +1,8 @@
 #include <Twothree.hpp>
 
 void Twothree::resetNode(std::shared_ptr <TwothreeNode> res){
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "")},{}));
+
     idxD = -100;
     if (res == nullptr)return;
     // std::cout << res->getString() << '\n';
@@ -125,6 +127,8 @@ std::shared_ptr <TwothreeNode> Twothree::newNode(std::vector <std::string> k, st
 
 void Twothree::insertNode(std::shared_ptr <TwothreeNode> t, std::shared_ptr <TwothreeNode> preNode, int idx, int val, bool isSplit){
     if (t == nullptr){
+        
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found position, make new node")},{}));
         auto funcQ = [this, val](){
             std::vector <std::string> listVal;
             listVal.push_back(std::to_string(val));
@@ -253,6 +257,9 @@ void Twothree::insert(int k){
     listInsert.push_back(k);
     std::cout << " k = " << k << '\n';
     std::shared_ptr <TwothreeNode> t = root, preNode = nullptr;
+
+    
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Move down to insert")},{}));
     
     // for (int i = 1; i <= 60; ++i)
     //     funcQueue.push(Animation({std::bind(&Node::setSearching, listNode[t], i/60.f)},{},{},{}));
@@ -313,6 +320,8 @@ void Twothree::search(int k){
     std::shared_ptr <TwothreeNode> t = root, preNode = nullptr;
     bool flag = 0;
     if (t == nullptr)return;
+    
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Searching for value")},{}));
 
     while (true) {
         flag = 0;
@@ -368,6 +377,8 @@ std::vector <std::string> getListIn(std::vector <sf::Text> X, std::string d){
 }
 
 void Twothree::removingNode(std::shared_ptr <TwothreeNode> t){
+    
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Find sunccesor")},{}));
     std::cout << "removingNode: " << (std::string)t->listValue[0].getString() << '\n';
     t = checkAlone(t);
     for (int i = 1; i <= 60; ++i)
@@ -505,7 +516,8 @@ std::shared_ptr <TwothreeNode> Twothree::checkAlone(std::shared_ptr <TwothreeNod
     if (t->listValue.size() > 1)return t;
 
     if (t == root)return t;
-
+    
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Node has 1 value, reconstruct")},{}));
     auto preNode = t->prevNode;
     int idx = 0, cnt = 0;
     while (preNode->childNode[idx].first != t)++idx;
@@ -673,7 +685,11 @@ void Twothree::continueRemove(std::shared_ptr <TwothreeNode> t, int k){
     
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
-    if (t->childNode.empty())return;
+    if (t->childNode.empty()){
+        
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Dont have node")},{}));
+        return;
+    }
 
     for (int i = 0; i < t->listValue.size(); ++i)
         if (k < ResourceManager::StringtoInt(t->listValue[i].getString())){
@@ -696,6 +712,8 @@ void Twothree::remove(int k){
     std::cout << " k = " << k << '\n';
     std::shared_ptr <TwothreeNode> t = root, preNode = nullptr;
     if (t == nullptr)return;
+    
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Move down to find node")},{}));
 
     auto func = [this,t, k](){
         continueRemove(t, k);
