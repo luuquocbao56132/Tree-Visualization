@@ -6,6 +6,7 @@
 
 class InputBox: public sf::Drawable, public sf::Transformable{
 public: 
+    InputBox();
     InputBox(sf::Vector2f , sf::Vector2f, std::string, bool);
     InputBox(sf::Vector2f , sf::Vector2f, std::string, bool, bool);
     void setValue(int);

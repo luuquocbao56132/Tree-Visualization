@@ -1,5 +1,7 @@
 #include <InputBox.hpp>
 
+InputBox::InputBox(){}
+
 InputBox::InputBox (sf::Vector2f position, sf::Vector2f size, std::string textLeft, bool isGo): 
     cursorOn(0), valueLimit(std::make_shared <int> (maxValue)), isCharacter(0)
 {
@@ -105,6 +107,7 @@ void InputBox::checkPress(sf::Vector2f mousePos){
 
 void InputBox::handleEvent(const sf::Event& event){
     if (event.key.code >= sf::Keyboard::Num0 && event.key.code <= sf::Keyboard::Num9 && !isCharacter){
+        std::cout << "ajidfjaidfoa" << '\n';
         if (m_cursorPos < 2){
             if (m_value > 9)return;
             std::string t = m_text.getString();

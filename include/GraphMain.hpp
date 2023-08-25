@@ -32,7 +32,7 @@ public:
     int a[100][100], n, d[100];
     std::vector <std::pair <int,int> > listEdge;
     Node listNode[100];
-    DynArrow listArrow[100][100];
+    std::pair <DynArrow,sf::Text> listArrow[100][100];
 };
 
 #endif // GraphMain_hpp
