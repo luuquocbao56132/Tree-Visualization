@@ -30,6 +30,7 @@ MinHeap::MinHeap(): DataTypes(), numValue(0){
     clearQueue();
     resetNode();
     balancePosition();
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "")},{}));
     checkFunctionFast();
 }
 
@@ -130,6 +131,7 @@ std::shared_ptr <Node> MinHeap::newNode(int k){
 void MinHeap::runUp(int idx, int cas){
     std::shared_ptr <Node> t = listNode[idx];
     std::shared_ptr <Node> preNode = listNode[idx/2];
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Push value up to Top")},{}));
 
     if (idx == 1 || t->getValue() >= preNode->getValue()){
         for (int i = 1; i <= 60; ++i)
@@ -157,6 +159,7 @@ void MinHeap::runUp(int idx, int cas){
             };
             funcQueue.push(Animation({},{},{},{funcc}));
         }
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Done")},{}));
         return;
     }
 
@@ -195,6 +198,7 @@ void MinHeap::runUp(int idx, int cas){
 
 void MinHeap::runDown(int idx){
     std::shared_ptr <Node> t = listNode[idx];
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Reconstruct heap")},{}));
 
     int tt, leftValue = 0, rightValue = 0;
     if (idx*2 <= numValue)leftValue = listNode[idx*2]->getValue();
@@ -212,6 +216,7 @@ void MinHeap::runDown(int idx){
             listNode[idx]->setTextColor(textColorStart);
         };
         funcQueue.push(Animation({},{},{},{funcLambda2}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Done")},{}));
         return;
     }
 
@@ -250,6 +255,7 @@ void MinHeap::runDown(int idx){
  
 void MinHeap::insert(int k){
     clearQueue(); resetNode(); balancePosition(); checkFunctionFast(); 
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Make new node at last leaf")},{}));
     std::cout << " k = " << k << '\n';
     ++numValue; listNode[numValue] = newNode(k);
     if (numValue > 1){
@@ -323,6 +329,7 @@ void MinHeap::fromfile(){
 void MinHeap::getTop(){
     clearQueue(); resetNode(); balancePosition(); checkFunctionFast(); 
     if (numValue == 0)return;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "return Top")},{}));
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&Node::setSearching, listNode[1], i/60.f)},{},{},{}));
 }
@@ -330,6 +337,7 @@ void MinHeap::getTop(){
 void MinHeap::remove(int vtx){
     clearQueue(); resetNode(); balancePosition(); checkFunctionFast(); 
     if (numValue == 0 || vtx > numValue)return;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Make the node value have the lower than min")},{}));
     listNode[vtx]->setText(std::to_string(listNode[1]->getValue() - 1));
 
     for (int i = 1; i <= 60; ++i)

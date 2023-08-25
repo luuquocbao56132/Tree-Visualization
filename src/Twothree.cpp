@@ -1,7 +1,7 @@
 #include <Twothree.hpp>
 
 void Twothree::resetNode(std::shared_ptr <TwothreeNode> res){
-    dirChild = -1;
+    idxD = -100;
     if (res == nullptr)return;
     // std::cout << res->getString() << '\n';
     TwothreeNode t = *res;

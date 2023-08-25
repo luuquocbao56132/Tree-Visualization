@@ -1,6 +1,7 @@
 #include <Trie.hpp>
 
 void Trie::resetNode(std::shared_ptr <Node> res){
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "")},{}));
     if (res == nullptr)return;
     // std::cout << res->getString() << '\n';
     Node t = *res;
@@ -146,6 +147,7 @@ std::shared_ptr <Node> Trie::newNode(std::string k, std::shared_ptr <Node> t){
 }
 
 void Trie::insertNode(std::string k, std::shared_ptr <Node> nod){
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "check node")},{}));
     for (int j = 1; j <= 60; ++j)
         funcQueue.push(Animation({std::bind(&Node::setSearching, nod, j/60.f)},{},{},{}));
     if (k == ""){
@@ -156,6 +158,7 @@ void Trie::insertNode(std::string k, std::shared_ptr <Node> nod){
                 funcQueue.push(Animation({std::bind(&Node::setFound, nod, i/60.f)},{},{},{}));
         };
         funcQueue.push(Animation({},{},{},{funcLambda}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Done")},{}));
         return;
     }
     std::string x = k.substr(0,1); k.erase(0,1); bool flag = 0;
@@ -165,9 +168,11 @@ void Trie::insertNode(std::string k, std::shared_ptr <Node> nod){
             for (int j = 1; j <= 60; ++j)
                 funcQueue.push(Animation({std::bind(&DynArrow::setPartialColor, nod->childNode[i].second, j/60.f),
                                         std::bind(&Node::removeSearching, nod, j/60.f)},{},{},{}));
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found node constructed, continue")},{}));
             flag = 1; nod = nod->childNode[i].first; break;
         }
     if (!flag){
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Make new node")},{}));
         auto neww = newNode(x, nod);
         // std::cout << neww->getString() << '\n'; Sleep(500);
         nod->childNode.push_back({neww, DynArrow(nod->m_position, nod->m_position)});
@@ -196,6 +201,7 @@ void Trie::insert(std::string k){
     checkFunctionFast(); 
     std::cout << " k = " << k << '\n';
     int idx = 0;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Start from pHead")},{}));
     auto funcQ = [this, k](){
         insertNode(k, graph.pHead);
     };
@@ -241,6 +247,7 @@ void Trie::search(std::string k){
     checkFunctionFast();  clearQueue(); resetNode(graph.pHead); balancePosition(graph.pHead,0, leftLimitBound); checkFunctionFast(); 
     std::cout << " k = " << k << '\n';
     std::shared_ptr <Node> t = graph.pHead;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Finding for each character")},{}));
     
     while (k != ""){
         for (int j = 1; j <= 60; ++j)
@@ -257,13 +264,16 @@ void Trie::search(std::string k){
         if (flag)continue;
         for (int j = 1; j <= 60; ++j)
             funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Don't have this string")},{}));
         return;
     }
     if (t->getHeight() == 0){
         for (int j = 1; j <= 60; ++j)
             funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Don't have this string")},{}));
         return;
     }
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found")},{}));
 }
 
 void Trie::removingNode(std::shared_ptr <Node> nod){
@@ -276,6 +286,7 @@ void Trie::removingNode(std::shared_ptr <Node> nod){
             resetNode(graph.pHead);
         };
         funcQueue.push(Animation({},{},{},{funcc}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Completed")},{}));
         return;
     }
 
@@ -306,7 +317,7 @@ void Trie::remove(std::string k){
     checkFunctionFast(); clearQueue(); resetNode(graph.pHead); balancePosition(graph.pHead,0, leftLimitBound); checkFunctionFast(); 
     std::cout << " k = " << k << '\n';
     std::shared_ptr <Node> t = graph.pHead;
-    
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Find the string to remove")},{}));
     while (k != ""){
         for (int j = 1; j <= 60; ++j)
             funcQueue.push(Animation({std::bind(&Node::setSearching, t, j/60.f)},{},{},{})); 
@@ -323,6 +334,7 @@ void Trie::remove(std::string k){
         for (int j = 1; j <= 60; ++j)
             funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
         if (flag)continue;
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Don't have this string")},{}));
         return;
     }
     funcQueue.push(Animation({std::bind(&Node::setDefault, t)},{},{},{}));
@@ -332,9 +344,10 @@ void Trie::remove(std::string k){
     if (t->getHeight() == 0){
         for (int j = 1; j <= 60; ++j)
             funcQueue.push(Animation({std::bind(&Node::removeSearching, t, j/60.f)},{},{},{}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Don't have this string")},{}));
         return;
     }
-
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found string, start to remove")},{}));
     auto funcLambda = [this,t](){
         t->setHeight(0);
         funcQueue.push(Animation({},{},{},{std::bind(&Node::setDefault, t)}));
