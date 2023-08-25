@@ -1,36 +1,28 @@
 #include <Highlight.hpp>
 
-Highlight::Highlight(): sizeShape(22), shapeOn(0){
-    hlShape.setFillColor(sf::Color::Transparent);
-    hlShape.setPosition(sf::Vector2f(1180,641));
-    hlShape.setPosition(sf::Vector2f(1180,641 + sizeShape*4));
-    hlShape.setSize(sf::Vector2f(470,18));
-    hlShape.setOutlineThickness(2.f);
-    hlShape.setOutlineColor(sf::Color::Black);
+Highlight::Highlight(){
+    highlightShape.setPosition(sf::Vector2f(1100,720));
+    highlightShape.setSize(sf::Vector2f(700,40));
+    highlightShape.setOutlineThickness(2.f);
+    highlightShape.setOutlineColor(sf::Color::Black);
+
+    highlightText = sf::Text("", ResourceManager::getFont(), 22);
+    highlightText.setFillColor(sf::Color::Black);
+    highlightText.setPosition(sf::Vector2f(1105,720));
+    setTheme();
 }
 
-void Highlight::addImage(std::string urll){
-    url = urll;
-    hlShape.setOutlineColor(TextColor[typeTheme]);
-    stepImageSprite.setScale(1.0f, 1.0f);
-    stepImage.loadFromFile(url);
-    stepImageSprite.setTexture(stepImage);
-    sf::IntRect textureRect(0, 0, stepImage.getSize().x, stepImage.getSize().y);
-    stepImageSprite.setTextureRect(textureRect);
-    sf::Vector2f pos = sf::Vector2f(1100, 550);
-    stepImageSprite.setPosition(pos);
+void Highlight::setLine(std::string x){
+    highlightText.setString(x);
 }
 
-void Highlight::setLine(int vtx){
-    --vtx; line = vtx;
-    hlShape.setPosition(sf::Vector2f(1180,641 + sizeShape*vtx));
+void Highlight::setTheme(){
+    highlightShape.setFillColor(ButtonColor[typeTheme]);
+    highlightShape.setOutlineColor(ButtonColor[typeTheme]);
+    highlightText.setFillColor(TextColor[typeTheme]);
 }
-
-int Highlight::getLine(){return line;}
-
-void Highlight::setHL(bool t){shapeOn = t;}
 
 void Highlight::draw(sf::RenderTarget& target, sf::RenderStates states) const{
-    target.draw(stepImageSprite);
-    if (shapeOn)target.draw(hlShape);
+    target.draw(highlightShape, states);
+    target.draw(highlightText, states);
 }

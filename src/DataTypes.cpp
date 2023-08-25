@@ -9,7 +9,8 @@ extern std::string theme;
 DataTypes::DataTypes():
         buttonSize(sf::Vector2f(90.f, 50.f)), buttonSpacing(sf::Vector2f(0.f, 5.f)),
         buttonPosition(sf::Vector2f(10.f, 780.f)), buttonRange(buttonSize + buttonSpacing),
-        buttonState(-1){     
+        buttonState(-1), highlight(){     
+            highlight.setLine("");
             MenuButton = Button(sf::Vector2f(10,10), sf::Vector2f(100,50), "Menu", ResourceManager::getFont(), 19, 0);
             caseSpeedButton = Button(sf::Vector2f(120,10), sf::Vector2f(100,50), "Case Speed", ResourceManager::getFont(), 19, 0);
             // upSpeed = Button(sf::Vector2f(980,10), sf::Vector2f(buttonSize.y/2,buttonSize.y/2), 
@@ -20,7 +21,7 @@ DataTypes::DataTypes():
             // timeText.setPosition(sf::Vector2f(upSpeed.getPosition().x - 50,buttonSize.y/2-10));
             // timeText.setFillColor(TextColor[typeTheme]);
 
-            int i = 300;
+            int i = 280;
             std::shared_ptr<Button> FromFile (new Button(buttonPosition + sf::Vector2f(buttonPosition.x + 0*i, buttonRange.y),
                             buttonSize + sf::Vector2f(100,0), "Insert from file", ResourceManager::getFont(), 20,0));
             std::shared_ptr<Button> Random (new Button(buttonPosition + sf::Vector2f(buttonPosition.x + 1*i - 100, buttonRange.y),
@@ -77,10 +78,7 @@ void DataTypes::clearQueue(){
 }
 
 void DataTypes::setTheme(){
-    // std::string res = mainGraph.highlight.url;
-    // res.erase(0,8);
-    // if (res[0] == '1')res.erase(res.begin());
-    // mainGraph.highlight.addImage("./Image/"+theme+res);
+    highlight.setTheme();
     MenuButton.setColor();
     caseSpeedButton.setColor();
     timeText.setFillColor(TextColor[typeTheme]);
@@ -102,6 +100,7 @@ void DataTypes::draw(sf::RenderTarget& target, sf::RenderStates states) const{
     target.draw(caseSpeedButton);
     target.draw(graphSquare);
     target.draw(timeText);
+    target.draw(highlight);
     // target.draw(upSpeed); target.draw(downSpeed); 
     // target.draw(previousButton); target.draw(nextButton);
     for (auto res : BaseButton)target.draw(*res);

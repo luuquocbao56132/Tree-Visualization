@@ -128,6 +128,7 @@ void HashTable::insert(int x){
         return;
     }
     
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Find empty node from (value mod n)")},{}));
     int j = x % graph.getSize(), first = (j - 1 < 0 ? j = graph.getSize()-1 : j - 1);
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{},{},{}));
@@ -146,6 +147,7 @@ void HashTable::insert(int x){
         return;
     }
     
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found node")},{}));
     for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::setFoundNode, &graph, j, i/60.f)}, {},
                                     {std::bind(&Node::setText, graph.listNode[j], std::to_string(x))},{}));
@@ -158,6 +160,7 @@ void HashTable::insert(int x){
 
 void HashTable::remove(int x){
     clearQueue(); resetNode(); 
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Search node to remove, start from (value mod n)")},{}));
 
     int j = x % graph.getSize(), first = (j - 1 < 0 ? j = graph.getSize()-1 : j - 1);
     for (int i = 1; i <= 60; ++i)
@@ -173,10 +176,11 @@ void HashTable::remove(int x){
     if (graph.listNode[j]->getString() == "" || j == first){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Doesn't have this value")},{}));
         return;
     }
 
-    funcQueue.push(Animation({}, {}, {}, {std::bind(&Node::setText, graph.listNode[j], "Del"), [this, j](){
+    funcQueue.push(Animation({}, {}, {std::bind(&Highlight::setLine, &highlight, "Delete value, mark this node to DEL")}, {std::bind(&Node::setText, graph.listNode[j], "Del"), [this, j](){
         --graph.numValue; graph.setDel(j);
     }}));
 
@@ -187,6 +191,7 @@ void HashTable::remove(int x){
 void HashTable::search(int x){
     clearQueue(); resetNode();
 
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Searching node, start from (value mod n)")},{}));
     int j = x % graph.getSize(), first = (j - 1 < 0 ? j = graph.getSize()-1 : j - 1);
     for (int i = 1; i <= 60; ++i)
         funcQueue.push(Animation({std::bind(&Array::setSearchingNode, &graph, j, i/60.f)},{},{},{}));
@@ -201,8 +206,10 @@ void HashTable::search(int x){
     if (graph.listNode[j]->getString() == "" || j == first){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::removeSearchingNode, &graph, j, i/60.f)},{},{},{}));
+        funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Doesn't have this value")},{}));
         return;
     }
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found node")},{}));
     for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Array::setFoundNode, &graph, j, i/60.f)}, {},{},{}));
 }

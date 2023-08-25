@@ -8,6 +8,7 @@
 #include <Theme.hpp>
 #include <Node.hpp>
 #include <Animation.hpp>
+#include <Highlight.hpp>
 
 class DataTypes: public sf::Drawable, public sf::Transformable{
 public:
@@ -35,6 +36,7 @@ public:
     // Graph firstGraph, mainGraph;
     //Graph xyz
     sf::Vector2f buttonSize, buttonSpacing, buttonPosition, buttonRange;
+    Highlight highlight;
 };
 
 #endif // DataTypes_hpp

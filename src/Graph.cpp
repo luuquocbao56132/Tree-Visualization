@@ -39,7 +39,6 @@ void Graph::init(int x, std::vector <std::string> s){
     x = 40;
     n = x; listNode.clear(); newNode = nullptr; isListNew = 0; nowStep = -1; numValue = s.size();
     resetStep(); 
-    highlight.addImage("./Image/" + theme + "Blank.png"); highlight.setHL(0);
     if (!n)return;
 
     leftBound = 850 - (100*(n) - arrowLength ) / 2;

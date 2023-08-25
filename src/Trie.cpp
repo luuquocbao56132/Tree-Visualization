@@ -21,7 +21,7 @@ Trie::Trie(): DataTypes(), graph(), leftLimitBound(60){
     for (int i = 2; i <= 4; ++i){
         auto x = BaseButton[i];
         BaseButton[i]->inputButton.clear();
-        BaseButton[i]->setPosition(BaseButton[i]->getPosition() + sf::Vector2f(120*(i-2), 0));
+        BaseButton[i]->setPosition(BaseButton[i]->getPosition() + sf::Vector2f(100*(i-2), 0));
         x->inputButton.push_back(std::make_shared <InputBox> (sf::Vector2f(x->getPosition().x + x->getSize().x + 40, 
                                                                             x->getPosition().y), 
                                                                         sf::Vector2f(inputButtonSize.x*2,inputButtonSize.y),"x = ",1,1));

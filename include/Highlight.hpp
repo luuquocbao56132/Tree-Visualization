@@ -6,14 +6,10 @@
 class Highlight: public sf::Transformable, public sf::Drawable{
 public:
     Highlight();
-    void addImage(std::string);
-    void setLine(int);
-    int getLine();
-    void setHL(bool);
-    sf::RectangleShape hlShape;
-    sf::Texture stepImage;
-    sf::Sprite stepImageSprite;
-    std::string url;
+    void setLine(std::string);
+    sf::RectangleShape highlightShape;
+    sf::Text highlightText;
+    void setTheme();
     void draw(sf::RenderTarget& , sf::RenderStates ) const override;
 private:
     int sizeShape, line;
