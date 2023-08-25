@@ -1,6 +1,7 @@
 #include <Twothree.hpp>
 
 void Twothree::resetNode(std::shared_ptr <TwothreeNode> res){
+    dirChild = -1;
     if (res == nullptr)return;
     // std::cout << res->getString() << '\n';
     TwothreeNode t = *res;
@@ -366,180 +367,138 @@ std::vector <std::string> getListIn(std::vector <sf::Text> X, std::string d){
     return listVal;
 }
 
-void Twothree::removingNode(std::shared_ptr <TwothreeNode> t, int val){
-    std::cout << "removingNode: " << (std::string)t->listValue[0].getString() << " " << val << '\n';
-    //Case 1: Node is leaf, at least 2 keys
-    if (t->childNode.empty() && t->listValue.size() > 1){
-        auto funcQ = [this, t, val](){
-            std::vector <std::string> listVal;
-            bool flg = 0;
-            for (auto i : t->listValue)
-                if (ResourceManager::StringtoInt(i.getString()) != val || flg)listVal.push_back(i.getString());
-                    else flg = 1;
-            *t = *newNode(listVal, t->prevNode, t->m_position);
+void Twothree::removingNode(std::shared_ptr <TwothreeNode> t){
+    std::cout << "removingNode: " << (std::string)t->listValue[0].getString() << '\n';
+    t = checkAlone(t);
+    for (int i = 1; i <= 60; ++i)
+        funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, i/60.f)},{},{},{}));
+
+    if (t->childNode.empty()){
+        auto funcQ = [this,t](){
+            int idxDel = 0;
+            if (dirChild)idxDel = t->listValue.size() - 1;
+            tDel->listValue[idxD].setString(t->listValue[idxDel].getString());
+            *t = *newNode(getListDel(t->listValue, t->listValue[idxDel].getString()), t->prevNode, t->m_position);
             t->setSearching(1);
             balancePosition(root, 0, 60);
             for (int i = 1; i <= 60; ++i)
                 funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
         };
-        funcQueue.push(Animation({},{},{},{funcQ})); 
-        return;
-    } 
+        funcQueue.push(Animation({},{},{},{funcQ})); return;
+    }
 
+    auto funcQ = [this,t](){
+        for (int i = 1; i <= 60; ++i)
+            funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
+        if (dirChild)removingNode(t->childNode.back().first);
+    };
+    funcQueue.push(Animation({},{},{},{funcQ})); return;
     //Case 2
-    if (!t->childNode.empty()){
-        int idx = 0;
-        for (int i = 0; i < t->listValue.size(); ++i)
-            if (ResourceManager::StringtoInt(t->listValue[i].getString()) == val){
-                idx = i; break;
-            }
-        //2.1
-        if (t->childNode[idx].first->listValue.size() > 1){
-            auto funcQ = [this, t, idx, val](){
-                auto res = t->childNode[idx].first;
-                for (int i = 1; i <= 60; ++i)
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
+//     if (!t->childNode.empty()){
+//         int idx = 0;
+//         for (int i = 0; i < t->listValue.size(); ++i)
+//             if (ResourceManager::StringtoInt(t->listValue[i].getString()) == val){
+//                 idx = i; break;
+//             }
+//         //2.1
+//         if (t->childNode[idx].first->listValue.size() > 1){
+//             auto funcQ = [this, t, idx, val](){
+//                 auto res = t->childNode[idx].first;
+//                 for (int i = 1; i <= 60; ++i)
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
                     
-                while (!res->childNode.empty()){
-                    for (int i = 1; i <= 60; ++i)
-                        funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, res, i/60.f)},{},{},{}));
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
-                    res = res->childNode.back().first;
-                    for (int i = 1; i <= 60; ++i)
-                        funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
-                }
+//                 while (!res->childNode.empty()){
+//                     for (int i = 1; i <= 60; ++i)
+//                         funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, res, i/60.f)},{},{},{}));
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
+//                     res = res->childNode.back().first;
+//                     for (int i = 1; i <= 60; ++i)
+//                         funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
+//                 }
 
-                auto funcc = [this,t,idx,res](){
-                    t->listValue[idx].setString(res->listValue.back().getString());
-                };
-                funcQueue.push(Animation({},{},{},{funcc}));
-                for (int i = 1; i <= 60; ++i)
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
-                continueRemove(t->childNode[idx].first, ResourceManager::StringtoInt(res->listValue.back().getString()));
-            };
-            funcQueue.push(Animation({},{},{},{funcQ})); 
-            return;
-        } else 
-        //2.2
-        if (t->childNode[idx+1].first->listValue.size() > 1){
-            auto funcQ = [this, t, idx, val](){
-                auto res = t->childNode[idx+1].first;
-                for (int i = 1; i <= 60; ++i)
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
+//                 auto funcc = [this,t,idx,res](){
+//                     t->listValue[idx].setString(res->listValue.back().getString());
+//                 };
+//                 funcQueue.push(Animation({},{},{},{funcc}));
+//                 for (int i = 1; i <= 60; ++i)
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
+//                 continueRemove(t->childNode[idx].first, ResourceManager::StringtoInt(res->listValue.back().getString()));
+//             };
+//             funcQueue.push(Animation({},{},{},{funcQ})); 
+//             return;
+//         } else 
+//         //2.2
+//         if (t->childNode[idx+1].first->listValue.size() > 1){
+//             auto funcQ = [this, t, idx, val](){
+//                 auto res = t->childNode[idx+1].first;
+//                 for (int i = 1; i <= 60; ++i)
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
                     
-                while (!res->childNode.empty()){
-                    for (int i = 1; i <= 60; ++i)
-                        funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, res, i/60.f)},{},{},{}));
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
-                    res = res->childNode[0].first;
-                    for (int i = 1; i <= 60; ++i)
-                        funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
-                }
+//                 while (!res->childNode.empty()){
+//                     for (int i = 1; i <= 60; ++i)
+//                         funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, res, i/60.f)},{},{},{}));
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
+//                     res = res->childNode[0].first;
+//                     for (int i = 1; i <= 60; ++i)
+//                         funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, res, i/60.f)},{},{},{}));
+//                 }
 
-                auto funcc = [this,t,idx,res](){
-                    t->listValue[idx].setString(res->listValue[0].getString());
-                };
-                funcQueue.push(Animation({},{},{},{funcc}));
-                for (int i = 1; i <= 60; ++i)
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
-                continueRemove(t->childNode[idx+1].first, ResourceManager::StringtoInt(res->listValue[0].getString()));
-            };
-            funcQueue.push(Animation({},{},{},{funcQ})); 
-            return;
-        } else { //2.3
-            if (t->listValue.size() == 1){
-                auto funcQ = [this, t, idx, val](){
-                    auto left = t->childNode[0].first, right = t->childNode[1].first;
-                    *t = *newNode({left->listValue[0].getString(), t->listValue[0].getString(), right->listValue[0].getString()}, 
-                                    t->prevNode, t->m_position);
+//                 auto funcc = [this,t,idx,res](){
+//                     t->listValue[idx].setString(res->listValue[0].getString());
+//                 };
+//                 funcQueue.push(Animation({},{},{},{funcc}));
+//                 for (int i = 1; i <= 60; ++i)
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setDefault, res)},{},{},{}));
+//                 continueRemove(t->childNode[idx+1].first, ResourceManager::StringtoInt(res->listValue[0].getString()));
+//             };
+//             funcQueue.push(Animation({},{},{},{funcQ})); 
+//             return;
+//         } else { //2.3
+//             if (t->listValue.size() == 1){
+//                 auto funcQ = [this, t, idx, val](){
+//                     auto left = t->childNode[0].first, right = t->childNode[1].first;
+//                     *t = *newNode({left->listValue[0].getString(), t->listValue[0].getString(), right->listValue[0].getString()}, 
+//                                     t->prevNode, t->m_position);
 
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, 1)},{},{},{}));
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, 1)},{},{},{}));
 
-                    for (int i = 0; i < (int)left->childNode.size(); ++i)
-                        t->childNode.push_back({left->childNode[i].first, DynArrow(t->m_position, left->childNode[i].first->m_position)}),
-                        left->childNode[i].first->prevNode = t;
+//                     for (int i = 0; i < (int)left->childNode.size(); ++i)
+//                         t->childNode.push_back({left->childNode[i].first, DynArrow(t->m_position, left->childNode[i].first->m_position)}),
+//                         left->childNode[i].first->prevNode = t;
 
-                    for (int i = 0; i < (int)right->childNode.size(); ++i)
-                        t->childNode.push_back({right->childNode[i].first, DynArrow(t->m_position, right->childNode[i].first->m_position)}),
-                        right->childNode[i].first->prevNode = t;
+//                     for (int i = 0; i < (int)right->childNode.size(); ++i)
+//                         t->childNode.push_back({right->childNode[i].first, DynArrow(t->m_position, right->childNode[i].first->m_position)}),
+//                         right->childNode[i].first->prevNode = t;
 
-                    balancePosition(root, 0, 60);
-                    continueRemove(t, val);
-                };
-                funcQueue.push(Animation({},{},{},{funcQ})); 
-                return;
-            } else {
-                auto funcQ = [this, t, idx, val](){
-                    auto left = t->childNode[idx].first, right = t->childNode[idx+1].first;
-                    auto ListChild = t->childNode;
-                    auto res = newNode({left->listValue[0].getString(), t->listValue[idx].getString(), right->listValue[0].getString()}, 
-                                    t, (left->m_position + right->m_position) / 2.f);
+//                     balancePosition(root, 0, 60);
+//                     continueRemove(t, val);
+//                 };
+//                 funcQueue.push(Animation({},{},{},{funcQ})); 
+//                 return;
+//             } else {
+//                 auto funcQ = [this, t, idx, val](){
+//                     auto left = t->childNode[idx].first, right = t->childNode[idx+1].first;
+//                     auto ListChild = t->childNode;
+//                     auto res = newNode({left->listValue[0].getString(), t->listValue[idx].getString(), right->listValue[0].getString()}, 
+//                                     t, (left->m_position + right->m_position) / 2.f);
             
-                    *t = *newNode(getListDel(t->listValue, std::to_string(val)), t->prevNode, t->m_position);
+//                     *t = *newNode(getListDel(t->listValue, std::to_string(val)), t->prevNode, t->m_position);
 
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, 1)},{},{},{}));
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, t, 1)},{},{},{}));
 
-                    for (int i = 0; i < idx; ++i)t->childNode.push_back(ListChild[i]);
-                    t->childNode.push_back({res, DynArrow(t->m_position, res->m_position)});
-                    for (int i = idx+2; i < ListChild.size(); ++i)t->childNode.push_back(ListChild[i]);
+//                     for (int i = 0; i < idx; ++i)t->childNode.push_back(ListChild[i]);
+//                     t->childNode.push_back({res, DynArrow(t->m_position, res->m_position)});
+//                     for (int i = idx+2; i < ListChild.size(); ++i)t->childNode.push_back(ListChild[i]);
                     
-                    balancePosition(root, 0, 60);
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, 1)},{},{},{}));
-                    continueRemove(res, val);
-                };
-                funcQueue.push(Animation({},{},{},{funcQ})); 
-                return;
-            }
-        }
-    }
-    //Case 3: Node is leaf, only 1 key
-    if (t->childNode.empty() && t->listValue.size() == 1){
-        auto preNode = t->prevNode;
-        int idx = 0, cnt = 0;
-        while (preNode->childNode[idx].first != t)++idx;
-
-        if (idx > 0){
-            if (preNode->childNode[idx-1].first->listValue.size() > 1){
-                auto func = [this, t, preNode, idx, val](){
-                    std::string leftVal = preNode->childNode[idx-1].first->listValue.back().getString();
-                    std::string rightVal = preNode->listValue[idx-1].getString();
-                    *preNode->childNode[idx-1].first = *newNode(getListDel(preNode->childNode[idx-1].first->listValue, leftVal), 
-                                                                preNode, preNode->childNode[idx-1].first->m_position);
-                    *t = *newNode(getListIn(t->listValue, rightVal), preNode, t->m_position);
-                    auto listChild = preNode->childNode;
-                    *preNode = *newNode(getListDel(preNode->listValue, rightVal), preNode->prevNode, preNode->m_position);
-                    *preNode = *newNode(getListIn(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, preNode, 1)},{},{},{}));
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, preNode, 1)},{},{},{}));
-                    for (auto i : listChild)preNode->childNode.push_back(i);
-                    balancePosition(root, 0, 60);
-                    removingNode(t, val);
-                };
-                funcQueue.push(Animation({},{},{},{func})); return;
-            }
-        }
-
-        if (idx < preNode->childNode.size()-1){
-            if (preNode->childNode[idx+1].first->listValue.size() > 1){
-                auto func = [this, t, preNode, idx, val](){
-                    std::string leftVal = preNode->listValue[idx].getString();
-                    std::string rightVal = preNode->childNode[idx+1].first->listValue[0].getString();
-                    *preNode->childNode[idx+1].first = *newNode(getListDel(preNode->childNode[idx+1].first->listValue, rightVal), 
-                                                                preNode, preNode->childNode[idx+1].first->m_position);
-                    *t = *newNode(getListIn(t->listValue, leftVal), preNode, t->m_position);
-                    auto listChild = preNode->childNode;
-                    *preNode = *newNode(getListDel(preNode->listValue, leftVal), preNode->prevNode, preNode->m_position);
-                    *preNode = *newNode(getListIn(preNode->listValue, rightVal), preNode->prevNode, preNode->m_position);
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::setSearching, preNode, 1)},{},{},{}));
-                    funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, preNode, 1)},{},{},{}));
-                    for (auto i : listChild)preNode->childNode.push_back(i);
-                    balancePosition(root, 0, 60);
-                    removingNode(t, val);
-                };
-                funcQueue.push(Animation({},{},{},{func})); return;
-            }
-        }
-    }
+//                     balancePosition(root, 0, 60);
+//                     funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, 1)},{},{},{}));
+//                     continueRemove(res, val);
+//                 };
+//                 funcQueue.push(Animation({},{},{},{funcQ})); 
+//                 return;
+//             }
+//         }
+//     }
 }
 
 std::shared_ptr <TwothreeNode> Twothree::checkAlone(std::shared_ptr <TwothreeNode> t){
@@ -557,6 +516,9 @@ std::shared_ptr <TwothreeNode> Twothree::checkAlone(std::shared_ptr <TwothreeNod
             std::string rightVal = preNode->listValue[idx-1].getString();
             auto leftChild = preNode->childNode[idx-1].first;
             std::pair <std::shared_ptr <TwothreeNode>, DynArrow> res;
+
+            if (idx-1 == idxD && tDel == preNode)
+                tDel = t, idxD = 0;
             
             auto listChild = leftChild->childNode;
             *preNode->childNode[idx-1].first = *newNode(getListDel(preNode->childNode[idx-1].first->listValue, leftVal), 
@@ -588,6 +550,9 @@ std::shared_ptr <TwothreeNode> Twothree::checkAlone(std::shared_ptr <TwothreeNod
             auto rightChild = preNode->childNode[idx+1].first;
             std::pair <std::shared_ptr <TwothreeNode>, DynArrow> res;
 
+            if (idx == idxD && tDel == preNode)
+                tDel = t, idxD = t->listValue.size();
+
             auto listChild = rightChild->childNode;
             *preNode->childNode[idx+1].first = *newNode(getListDel(preNode->childNode[idx+1].first->listValue, rightVal), 
                                                         preNode, preNode->childNode[idx+1].first->m_position);
@@ -613,6 +578,8 @@ std::shared_ptr <TwothreeNode> Twothree::checkAlone(std::shared_ptr <TwothreeNod
             std::string rightVal = preNode->childNode[idx+1].first->listValue[0].getString();
             auto rightChild = preNode->childNode[idx+1].first;
             auto listChild = t->childNode;
+            if (idx == idxD && tDel == preNode)
+                tDel = t, idxD = t->listValue.size();
             *t = *newNode(getListIn(t->listValue, leftVal), preNode, t->m_position);
             *t = *newNode(getListIn(t->listValue, rightVal), preNode, t->m_position);
             for (auto i : listChild)t->childNode.push_back(i);
@@ -645,6 +612,8 @@ std::shared_ptr <TwothreeNode> Twothree::checkAlone(std::shared_ptr <TwothreeNod
     std::string rightVal = preNode->childNode[idx+1].first->listValue[0].getString();
     auto rightChild = preNode->childNode[idx+1].first;
     auto listChild = t->childNode;
+    if (idx == idxD && tDel == preNode)
+        tDel = t, idxD = t->listValue.size();
     *t = *newNode(getListIn(t->listValue, leftVal), preNode, t->m_position);
     *t = *newNode(getListIn(t->listValue, rightVal), preNode, t->m_position);
     for (auto i : listChild)t->childNode.push_back(i);
@@ -682,10 +651,23 @@ void Twothree::continueRemove(std::shared_ptr <TwothreeNode> t, int k){
     
     for (int i = 0; i < t->listValue.size(); ++i){
         if (k == ResourceManager::StringtoInt(t->listValue[i].getString())){
-            auto func = [this,t, k](){
-                removingNode(t, k);
-            };
-            funcQueue.push(Animation({},{},{},{func})); return;
+            if (!t->childNode.empty()){
+                auto func = [this,t, k, i](){
+                    idxD = i; dirChild = 1; tDel = t;
+                    removingNode(t->childNode[i].first);
+                };
+                funcQueue.push(Animation({},{},{},{func})); return;
+            } else {
+                auto funcQ = [this, t, k](){
+                    *t = *newNode(getListDel(t->listValue, std::to_string(k)), t->prevNode, t->m_position);
+                    t->setSearching(1);
+                    balancePosition(root, 0, 60);
+                    for (int i = 1; i <= 60; ++i)
+                        funcQueue.push(Animation({std::bind(&TwothreeNode::removeSearching, t, i/60.f)},{},{},{}));
+                };
+                funcQueue.push(Animation({},{},{},{funcQ})); 
+                return;
+            }
         }
     }
     

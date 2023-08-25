@@ -1,13 +1,13 @@
 #include <Menu.hpp>
 
 Menu::Menu(){
-    bHash = Button(sf::Vector2f(800.f, 420.f), sf::Vector2f(125.f, 60.f), "Hash Table", ResourceManager::getFont(), 20, 0);
+    bHash = Button(sf::Vector2f(645.f, 520.f), sf::Vector2f(125.f, 60.f), "Hash Table", ResourceManager::getFont(), 20, 0);
     bAVL = Button(sf::Vector2f(800.f, 520.f), sf::Vector2f(125.f, 60.f), "AVL Tree", ResourceManager::getFont(), 20, 0);
     b234 = Button(sf::Vector2f(800.f, 620.f), sf::Vector2f(125.f, 60.f), "234 Tree", ResourceManager::getFont(), 20, 0);
-    bMinHeap = Button(sf::Vector2f(975.f, 420.f), sf::Vector2f(125.f, 60.f), "Min Heap", ResourceManager::getFont(), 20, 0);
+    bMinHeap = Button(sf::Vector2f(645.f, 620.f), sf::Vector2f(125.f, 60.f), "Min Heap", ResourceManager::getFont(), 20, 0);
     bMaxHeap = Button(sf::Vector2f(975.f, 520.f), sf::Vector2f(125.f, 60.f), "Max Heap", ResourceManager::getFont(), 20, 0);
     bTrie = Button(sf::Vector2f(975.f, 620.f), sf::Vector2f(125.f, 60.f), "Trie", ResourceManager::getFont(), 20, 0);
-    bGraph = Button(sf::Vector2f(890.f, 720.f), sf::Vector2f(125.f, 60.f), "Graph", ResourceManager::getFont(), 20, 0);
+    bGraph = Button(sf::Vector2f(800.f, 720.f), sf::Vector2f(125.f, 60.f), "Graph", ResourceManager::getFont(), 20, 0);
 }
 
 void Menu::setTheme(){

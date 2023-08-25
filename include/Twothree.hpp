@@ -24,7 +24,7 @@ public:
     void checkArrowFast(std::shared_ptr <TwothreeNode> );
     std::shared_ptr <TwothreeNode> checkAlone(std::shared_ptr <TwothreeNode> );
     void insertNode(std::shared_ptr <TwothreeNode> , std::shared_ptr <TwothreeNode> , int , int, bool);
-    void removingNode(std::shared_ptr <TwothreeNode>, int);
+    void removingNode(std::shared_ptr <TwothreeNode>);
     void continueRemove(std::shared_ptr <TwothreeNode>, int);
     void insert(int);
     void remove(int);
@@ -36,7 +36,8 @@ public:
 
     std::vector <int> listInsert;
     std::vector< std::pair < int, std::shared_ptr <TwothreeNode> > > listNode;
-    std::shared_ptr <TwothreeNode> root;
+    std::shared_ptr <TwothreeNode> root, tDel;
+    int idxD, dirChild;
 };
 
 #endif // Twothree_hpp
