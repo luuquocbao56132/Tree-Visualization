@@ -137,13 +137,14 @@ void MaxHeap::runUp(int idx, int cas){
         for (int i = 1; i <= 60; ++i)
             funcQueue.push(Animation({std::bind(&Node::removeSearching, listNode[idx], i/60.f)},{},{},{}));
         if (cas){
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Delete Node")},{}));
             for (int i = 1; i <= 60; ++i){
                 auto funcDel = [this, i]{
                     listNode[1]->changeSizeNode(CircleRad/60.f);
                 };
                 funcQueue.push(Animation({},{},{},{funcDel}));
             }
-
+            
             auto funcDel = [this]{
                 if (numValue & 1)listArrow[numValue / 2].second.setTail(getPosI(numValue/2));
                         else listArrow[numValue / 2].first.setTail(getPosI(numValue/2));
@@ -158,6 +159,7 @@ void MaxHeap::runUp(int idx, int cas){
                 runDown(1);
             };
             funcQueue.push(Animation({},{},{},{funcc}));
+            return;
         }
         funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Done")},{}));
         return;

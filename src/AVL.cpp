@@ -191,6 +191,7 @@ void AVL::rightRotate(int k, int cas){
 
 void AVL::checkBalance(std::shared_ptr <Node> t){
     if (t == nullptr)return;
+    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Check balance for graph")},{}));
     // std::cout << "balance: " << t->getValue() << '\n';
     int balance = getBalance(t);
     // std::cout << t << " " << t->getValue() << " " << balance << '\n';
@@ -209,24 +210,28 @@ void AVL::checkBalance(std::shared_ptr <Node> t){
                             << (rightChild != nullptr ? rightChild->getValue() : 0) << " " << getBalance(rightChild) << '\n';
         if (balance > 1 && getBalance(leftChild) >= 0){
             auto setFunctionLambda = [t,this]() {
+                funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Right Rotate")},{}));
                 rightRotate(t->getValue(), 0);
             };
             funcQueue.push(Animation({},{},{},{setFunctionLambda}));
             return;
         } else if (balance < -1 && getBalance(rightChild) <= 0){
             auto setFunctionLambda = [t,this]() {
+                funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Left Rotate")},{}));
                 leftRotate(t->getValue(), 0);
             };
             funcQueue.push(Animation({},{},{},{setFunctionLambda}));
             return;
         } else if (balance > 1 && getBalance(leftChild) < 0){
             auto setFunctionLambda = [leftChild,this]() {
+                funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Lef Right Rotate")},{}));
                 leftRotate(leftChild->getValue(), 1);
             };
             funcQueue.push(Animation({},{},{},{setFunctionLambda}));
             return; 
         } else if (balance < -1 && getBalance(rightChild) > 0){
             auto setFunctionLambda = [rightChild,this]() {
+                funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Right Left Rotate")},{}));
                 rightRotate(rightChild->getValue(), 1); 
             };
             funcQueue.push(Animation({},{},{},{setFunctionLambda}));
@@ -319,7 +324,7 @@ std::shared_ptr <Node> AVL::newNode(int k, std::shared_ptr <Node> t){
 
 void getHeightAll(std::shared_ptr <Node> t){
     if (t == nullptr)return;
-    std::cout << "t: " << t->getValue() << " height: " << t->getHeight() << '\n';
+    // std::cout << "t: " << t->getValue() << " height: " << t->getHeight() << '\n';
     getHeightAll(t->childNode[0].first);
     getHeightAll(t->childNode[1].first);
 }
@@ -446,9 +451,11 @@ void AVL::search(int k){
                 funcQueue.push(Animation({std::bind(&Node::removeSearching, preNode, i/60.f),
                                             std::bind(&DynArrow::setPartialColor, preNode->childNode[idx].second, i/60.f)},{},{},{}));
             funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Move to the right")},{}));
-        } else break;
+        } else {
+            funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Found")},{}));
+            break;
+        }
     }
-    funcQueue.push(Animation({},{},{std::bind(&Highlight::setLine, &highlight, "Founded")},{}));
 }
 
 void AVL::remove(int k){
